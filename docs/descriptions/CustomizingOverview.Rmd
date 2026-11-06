@@ -1,8 +1,0 @@
-#### **Customizing Your LLM** (30 mins, Tom)
-
-Extending an AI assistant with your own instructions, skills and connections.
-
-* Skills
-* Connectors and plugins — an introduction to MCP
-* Knowledge-based queries and where to learn more
-* Exercises: CLAUDE.md before/after, invoking a skill, querying an MCP connector

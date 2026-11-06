@@ -1,8 +1,8 @@
 ---
-title: "Responsible Use of AI for Non-Coders: AI in Your Workflow"
+title: "Responsible Use of Agentic AI: AI in Your Workflow"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/](http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/)"
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
 ---
 
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
 ::: {.content-hidden when-format="revealjs"}
-# Responsible Use of AI for Non-Coders: AI in Your Workflow
+# Responsible Use of Agentic AI: AI in Your Workflow
 :::
 
 ## Overview

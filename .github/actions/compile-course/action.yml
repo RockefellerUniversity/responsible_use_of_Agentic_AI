@@ -3,7 +3,7 @@ description: >-
   Install the RockefellerUniversity/compileCourses engine and render the course
   material (slides, single page and R code) via compileSingleCourseMaterial().
   Runs inside the caller's job, so it works in the Bioconductor docker container
-  and in the OS / legacy-R matrix jobs alike.
+  and in the OS matrix jobs alike.
 
 inputs:
   repo:
@@ -34,7 +34,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    ## Quarto CLI — the Bioconductor docker and the OS/legacy-R runners don't
+    ## Quarto CLI — the Bioconductor docker and the OS runners don't
     ## ship it. The engine drives Quarto via the `quarto` R package, which needs
     ## the CLI on PATH.
     - name: Set up Quarto

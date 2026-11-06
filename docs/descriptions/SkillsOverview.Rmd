@@ -1,0 +1,7 @@
+#### **Skills** (?? mins)
+
+Packaging your own instructions and workflows so an AI assistant can reuse them.
+
+* What a skill is, and instruction files such as CLAUDE.md
+* Invoking and writing skills
+* Exercises: CLAUDE.md before/after, invoking a skill

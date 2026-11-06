@@ -1,0 +1,38 @@
+---
+title: "Responsible Use of Agentic AI: Skills"
+subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
+author:
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
+---
+
+```{r setup, include=FALSE, purl=FALSE}
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+```
+
+::: {.content-hidden when-format="revealjs"}
+# Responsible Use of Agentic AI: Skills
+:::
+
+## Overview
+
+*Presenter: ?? — ?? mins*
+
+- [What is a skill?](#what-is-a-skill)
+- [Using and writing skills](#using-and-writing-skills)
+- [Exercises](#time-for-an-exercise)
+
+# Skills {background-color="#23373B" .center .middle}
+
+## What is a skill?
+
+??What a skill is (packaged instructions the model loads for a particular kind of task), and examples??
+
+## Using and writing skills
+
+??How to invoke an existing skill, how to write a simple one, and instruction files such as CLAUDE.md??
+
+## Time for an exercise
+
+Exercises are available [here](../exercises/exercises/Exercise_Skills_exercise.html).

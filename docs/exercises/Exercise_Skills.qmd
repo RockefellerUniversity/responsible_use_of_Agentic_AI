@@ -1,0 +1,40 @@
+---
+title: "Exercise: Skills"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/"
+format:
+  html:
+    theme:
+      - cosmo
+      - metropolis-page.scss    # same RU look as the single-page presentations
+    embed-resources: true
+    format-links: false
+    include-before-body: page-logo.html
+params:
+  toMessage: false
+---
+
+```{r, setup, include=FALSE, purl=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage), params$toMessage, FALSE)
+```
+
+<p>&nbsp;</p>
+These exercises are about extending an AI assistant with instruction files and skills.
+
+**Do not paste protected or unpublished data into any AI tool.**
+
+**Exercise 1** - **Before and after CLAUDE.md**
+
+- ??Ask the assistant a question. Then add an instruction to your CLAUDE.md (or equivalent custom instructions), start a new conversation and ask the same question. What changed???
+
+```{asis, echo=toMessage}
+??Answer??
+```
+
+**Exercise 2** - **Invoke a skill**
+
+- ??Invoke an existing skill on a small task and describe how the output differs from an unaided request??
+
+```{asis, echo=toMessage}
+??Answer??
+```

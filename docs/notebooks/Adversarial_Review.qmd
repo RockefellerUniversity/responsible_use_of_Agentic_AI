@@ -1,0 +1,43 @@
+---
+title: "Responsible Use of Agentic AI: Adversarial Review"
+subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
+author:
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
+---
+
+```{r setup, include=FALSE, purl=FALSE}
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+```
+
+::: {.content-hidden when-format="revealjs"}
+# Responsible Use of Agentic AI: Adversarial Review
+:::
+
+## Overview
+
+*Presenter: ?? — ?? mins*
+
+- [Why review AI output adversarially?](#why-review-ai-output-adversarially)
+- [Running an adversarial review](#running-an-adversarial-review)
+- [Limits of AI reviewing AI](#limits-of-ai-reviewing-ai)
+- [Exercises](#time-for-an-exercise)
+
+# Adversarial Review {background-color="#23373B" .center .middle}
+
+## Why review AI output adversarially?
+
+??Asking a model (ideally a fresh session or a different model) to find faults in work rather than confirm it; sycophancy and confirmation bias??
+
+## Running an adversarial review
+
+??Prompts and workflows for red-teaming an analysis, document or piece of code; verifying each reported issue before acting on it??
+
+## Limits of AI reviewing AI
+
+??Shared blind spots, false positives, and why the human remains the final check??
+
+## Time for an exercise
+
+Exercises are available [here](../exercises/exercises/Exercise_Adversarial_Review_exercise.html).

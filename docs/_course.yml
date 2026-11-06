@@ -1,5 +1,5 @@
 Description:
-  CourseName: Responsible Use of AI for Non-Coders
+  CourseName: Responsible Use of Agentic AI
   OverviewRmd: CourseOverview.Rmd
 Presentations:
   - title: AI Strategy at Rockefeller
@@ -19,11 +19,21 @@ Presentations:
     PresOverviewRmd: Query_ContextOverview.Rmd
     Exercises:
       - Exercise_ContextTokens.qmd
-  - title: Customizing Your LLM
-    PresRmd: Customizing.qmd
-    PresOverviewRmd: CustomizingOverview.Rmd
+  - title: Skills
+    PresRmd: Skills.qmd
+    PresOverviewRmd: SkillsOverview.Rmd
     Exercises:
-      - Exercise_Customizing.qmd
+      - Exercise_Skills.qmd
+  - title: Connectors and Plugins
+    PresRmd: Connectors_Plugins.qmd
+    PresOverviewRmd: Connectors_PluginsOverview.Rmd
+    Exercises:
+      - Exercise_Connectors_Plugins.qmd
+  - title: Adversarial Review
+    PresRmd: Adversarial_Review.qmd
+    PresOverviewRmd: Adversarial_ReviewOverview.Rmd
+    Exercises:
+      - Exercise_Adversarial_Review.qmd
   - title: What AI Is Good and Bad At
     PresRmd: Strengths_Limitations.qmd
     PresOverviewRmd: Strengths_LimitationsOverview.Rmd

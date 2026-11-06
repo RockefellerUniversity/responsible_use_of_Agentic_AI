@@ -1,0 +1,8 @@
+#### **Adversarial Review** (?? mins)
+
+Using AI to critique work, and verifying the critique before acting on it.
+
+* Why review AI output adversarially
+* Running an adversarial review
+* Limits of AI reviewing AI
+* Exercises: reviewing a piece of work

@@ -1,0 +1,32 @@
+---
+title: "Exercise: Adversarial Review"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/"
+format:
+  html:
+    theme:
+      - cosmo
+      - metropolis-page.scss    # same RU look as the single-page presentations
+    embed-resources: true
+    format-links: false
+    include-before-body: page-logo.html
+params:
+  toMessage: false
+---
+
+```{r, setup, include=FALSE, purl=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage), params$toMessage, FALSE)
+```
+
+<p>&nbsp;</p>
+These exercises are about getting an AI to critique work, and checking the critique.
+
+**Do not paste protected or unpublished data into any AI tool.**
+
+**Exercise 1** - **Review a piece of work**
+
+- ??Take a short piece of your own (non-sensitive) work and ask the assistant, in a fresh session, to find faults. Verify each issue it raises. How many were real???
+
+```{asis, echo=toMessage}
+??Answer??
+```

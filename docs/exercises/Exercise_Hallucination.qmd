@@ -1,7 +1,7 @@
 ---
 title: "Exercise: Provoking a Hallucination"
 author: "Rockefeller University, Bioinformatics Resource Centre"
-date: "https://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/"
+date: "https://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/"
 format:
   html:
     theme:

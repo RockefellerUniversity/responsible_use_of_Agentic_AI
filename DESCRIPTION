@@ -1,6 +1,6 @@
-Package: ResponsibleAINonCoders
+Package: ResponsibleAgenticAI
 Type: Package
-Title: Responsible Use of AI for Non-Coders
+Title: Responsible Use of Agentic AI
 Version: 2.0.0
 Author: Matt Paul and Thomas Carroll.
 Maintainer: Thomas Carroll <tc.infomatics@gmail.com>
@@ -12,5 +12,5 @@ Description: Dependency + system-requirements manifest for the course. The cours
 License: GPL (>= 2)
 Depends: methods
 Imports: ggplot2, dplyr, ggrepel, scales
-SystemRequirements:
+SystemRequirements: LLM.GUI
 biocViews: Training

@@ -1,4 +1,4 @@
-# Responsible Use of AI for Non-Coders
+# Responsible Use of Agentic AI
 
 <br>
 
@@ -6,7 +6,7 @@ This course introduces researchers who do not write code to the responsible use 
 
 No programming experience is required.
 
-Course material and exercises are available to view as rendered HTML at https://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/.
+Course material and exercises are available to view as rendered HTML at https://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/.
 All material is available to download under GPL v2 license.
 
 *Disclosure of Delegation to Generative AI:* The construction of course infrastructure and the review of course content was assisted by LLMs. The course content was made by people.

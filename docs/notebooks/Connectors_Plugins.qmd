@@ -1,0 +1,43 @@
+---
+title: "Responsible Use of Agentic AI: Connectors and Plugins"
+subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
+author:
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
+---
+
+```{r setup, include=FALSE, purl=FALSE}
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+```
+
+::: {.content-hidden when-format="revealjs"}
+# Responsible Use of Agentic AI: Connectors and Plugins
+:::
+
+## Overview
+
+*Presenter: ?? — ?? mins*
+
+- [Connectors and MCP](#connectors-and-mcp)
+- [Plugins](#plugins)
+- [Security and data considerations](#security-and-data-considerations)
+- [Exercises](#time-for-an-exercise)
+
+# Connectors and Plugins {background-color="#23373B" .center .middle}
+
+## Connectors and MCP
+
+??Connectors, introducing the Model Context Protocol (MCP) as the standard way to connect an AI tool to other services and data; grounding answers in your own documents??
+
+## Plugins
+
+??Plugins as bundles of skills, connectors and commands, and where to find them??
+
+## Security and data considerations
+
+??What a connector can see and do, permissions, trusting third-party plugins, and Rockefeller data policy??
+
+## Time for an exercise
+
+Exercises are available [here](../exercises/exercises/Exercise_Connectors_Plugins_exercise.html).

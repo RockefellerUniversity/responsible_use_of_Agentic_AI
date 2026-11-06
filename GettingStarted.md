@@ -152,15 +152,13 @@ another line under that session's `Exercises`.
 
 The compilation workflows live in the top-level `.github/` directory. They detect
 pushes, recompile the content into `docs/`, and run basic checks of the R code.
-There are three, plus a link checker:
+There are two, plus a link checker:
 
 1. **compilation-check** — builds the course (rendering in place into `docs/`) and
    publishes it; GitHub Pages serves `docs/`.
 2. **OS-check** — checks the course compiles across macOS, Windows and Ubuntu
    Linux (R release and devel).
-3. **legacy-R-check** — attempts to compile on every major R release since 3.5
-   (Linux only), documenting the R-version compatibility floor.
-4. **link-check** — after a successful build, verifies the site's links (local
+3. **link-check** — after a successful build, verifies the site's links (local
    files/anchors + remote reachability) and reports broken ones.
 
 The shared install-and-compile logic lives in the composite action at

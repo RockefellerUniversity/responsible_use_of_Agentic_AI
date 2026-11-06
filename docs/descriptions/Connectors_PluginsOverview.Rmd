@@ -1,0 +1,8 @@
+#### **Connectors and Plugins** (?? mins)
+
+Connecting an AI assistant to other services and data, and extending it with plugins.
+
+* Connectors and the Model Context Protocol (MCP)
+* Plugins: bundles of skills, connectors and commands
+* Security and data considerations
+* Exercises: querying a connector

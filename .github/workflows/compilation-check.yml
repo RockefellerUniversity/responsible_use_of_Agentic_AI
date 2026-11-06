@@ -184,7 +184,7 @@ jobs:
         shell: Rscript {0}
 
       ## Install the compileCourses engine, install the local package and
-      ## render the course. Shared with OS-check and legacy-R-check.
+      ## render the course. Shared with OS-check.
       - name: Compile course
         uses: ./.github/actions/compile-course
         with:
