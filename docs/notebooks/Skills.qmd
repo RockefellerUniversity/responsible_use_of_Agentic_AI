@@ -1,8 +1,8 @@
 ---
-title: "Responsible Use of Agentic AI: Skills"
+title: "Responsible Use of AI for Coders: Skills"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/](http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
 ---
 
@@ -12,26 +12,461 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
 ::: {.content-hidden when-format="revealjs"}
-# Responsible Use of Agentic AI: Skills
+# Responsible Use of AI for Coders: Skills?
 :::
 
 ## Overview
 
-*Presenter: ?? — ?? mins*
+- [What is a skill? Why do we need it?](#what-is-a-skill)
+- [SKILL.md file](#skill-md)
+- [Installing skills from public sources](#installing-skills)
+- [Developing your own skills](#developing-skills)
 
-- [What is a skill?](#what-is-a-skill)
-- [Using and writing skills](#using-and-writing-skills)
-- [Exercises](#time-for-an-exercise)
+# What is a skill? Why do we need it? {#what-is-a-skill .center .middle background-color="#23373B"}
 
-# Skills {background-color="#23373B" .center .middle}
+## Built-in commands and skills
 
-## What is a skill?
+Most models will have commands that are built in and are always available when Claude Code or Codex are installed. These are part of the model and are explicitly called like a function call while coding. 
 
-??What a skill is (packaged instructions the model loads for a particular kind of task), and examples??
+- e.g. `/init`, `/plan`, `/rewind`, `/compact`
+- [Claude code](https://code.claude.com/docs/en/commands) and [Codex](https://learn.chatgpt.com/docs/cli/slash-commands) have many common commands, and some unique as well. 
 
-## Using and writing skills
+Skills are similar, but they allow for a high level of customization, are portable, and can be called by you or by the model.
 
-??How to invoke an existing skill, how to write a simple one, and instruction files such as CLAUDE.md??
+## Skills help with reproducibility 
+
+Investing in developing useful and well-designed skills can help your workflows in a few key ways:
+
+- consistency across analyses, increasing reproducibility and saving time
+    - when you ask the model to do something, it does what you expect every time
+    - shorter prompts without need for specific details
+- skills can be shared between people, providing standards within a lab, team, or between collaborators
+- extend capabilities of LLM model (e.g. Anthropic's built in word/excel skills)
+
+## Skills are universal
+
+The skills format was initially developed by Anthropic, then the method was released as an open standard and is now used widely by most models.
+
+There will be slight differences between models that we will mention, but the concept is the same. The accepted specifications reference is here: [https://agentskills.io](https://agentskills.io).
+
+## Skill directory
+
+A skill is simply a directory on your computer that the model knows about and will use when it thinks it should, or when explicitly called. 
+
+  - the *SKILL.md* file is the only required file in the skills directory.
+  
+```{=html}
+<pre class="tree">
+bioinformatics-skill/
+├── SKILL.md          # Required: metadata (e.g. name, description) + instructions
+├── scripts/          # Optional: code that can be run when skill is fired
+├── references/       # Optional: documentation (e.g. method specifics, checklists)
+├── assets/           # Optional: report templates, data files, images, etc.
+└── ...               # additional files or folders 
+</pre>
+```
+
+
+## Skill scope
+
+The location of this folder will determine where that skill is available.
+
+  - for global skills, with claude this will be located at *~/.claude/skills*
+  - this will be slightly different for other models (e.g. *~/.codex/skills/*)
+  - skills can also be limited to specific folders or projects. 
+  - a *.claude* or *.codex* directory can exist anywhere on your system, and your session will read any skill that exists in the path of that project. 
+
+# SKILL.md file {#skill-md .center .middle background-color="#23373B"}
+
+## SKILL.md file - YAML header
+
+The required *SKILL.md* file needs a YAML header and must have the `name` and `description` fields. A few [other optional fields](https://agentskills.io/specification) are allowed in the header as well (e.g. allowed-tools).
+
+  - **name:** can only contain lower case letters, numbers, and hypens (no hyphens at the beginning or end of the name)
+  - **description:** max of 1024 characters outlining what this skill does, and when the model should use it. 
+  
+
+```{.yaml filename="SKILL.md"}
+---
+name: bioinformatics-skill
+description: What does this skill do? When should it be used?
+---
+
+```
+
+## SKILL.md file - Body section
+
+After the metadata header, the rest of the SKILL.md file is markdown-formatted text providing instructions to the model. This can take many forms, but it might include:
+
+- steps in a workflow
+- expected outputs
+- common problems to avoid
+- when to run scripts in the skills folder
+- recommended to keep below 500 lines (~5k tokens) - more details or code templates can be selectively read from the *references* or *assets* folders
+- don't repeat things model already would know
+
+
+```{.yaml filename="SKILL.md"}
+---
+name: bioinformatics-skill
+description: What does this skill do? When should it be used?
+---
+
+body: instructions for the model
+```
+
+## Minimizing tokens with 'progressive disclosure'
+
+Skills are loaded and read into context in three steps:
+
+- **Discovery:** when a session is started only the name and description are read into context.
+- **Activation:** when the model determines a user prompt requires the skill, the rest of the SKILL.md file is read.
+- **Execution:** based on the instructions of the skill, additional files might be read or scripts might be run.
+
+This progression ensures that many skills can be available for use in a session, but your context isn't flooded with too much information and token use is minimized. 
+
+## A good description is key
+
+This format makes the description the critical part of the skill. It will determine whether a skill is used after a prompt is entered. 
+
+If the description is too vague, then it will fire too often and use tokens unnecessarily. If it's too narrow, then it will never be used.
+
+Description tips:
+
+  - should focus primarily on what the user is trying to do, and less on what the skill does internally.
+  - explicitly say when it should be used: 'Use this skill when user asks to review, check, or QC scRNA analyses', not 'This skill performs QC for scRNAseq analyses'
+  - including keywords you will often use will help ('review' or 'check' above)
+  - can also include when it should not be used
+
+
+# Installing skills from public sources {#installing-skills .center .middle background-color="#23373B"}
+
+## Installing skills - Public marketplaces
+
+- **Install from a marketplace:** Marketplaces contain plugins, each of which has their own set of skills.
+
+Anthropic and OpenAI have marketplaces with many useful plugins, but you can add a marketplace from any public source, like a Github repository (e.g. skills shared in your lab or by the BRC).
+
+```{=html}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+  .hier-wrap {
+    --mkt-bg:     #d6e8fa;
+    --mkt-border: #7ab4e8;
+    --mkt-label:  #3a6ea5;
+    --mkt-name:   #1a3d6b;
+    --plug-bg:    #e8daf7;
+    --plug-border:#a97de0;
+    --plug-label: #6b30b8;
+    --plug-name:  #4a1e8a;
+    --skill-bg:   #fff;
+    --skill-border:#c4a8ef;
+    --skill-fg:   #6b30b8;
+    --shadow-mkt: 0 4px 16px rgba(80,120,200,0.10);
+    --shadow-plug: 0 2px 8px rgba(120,80,200,0.10);
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 0.5rem 0 1rem;
+  }
+  .hier-mkt {
+    flex: 1;
+    min-width: 200px;
+    background: var(--mkt-bg);
+    border: 2px solid var(--mkt-border);
+    border-radius: 18px;
+    padding: 1.1rem 1.1rem 1.25rem;
+    box-shadow: var(--shadow-mkt);
+  }
+  .hier-level-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.15rem;
+  }
+  .hier-mkt .hier-level-label  { color: var(--mkt-label); }
+  .hier-plug .hier-level-label { color: var(--plug-label); }
+  .hier-mkt-name  { font-size: 0.88rem; font-weight: 600; color: var(--mkt-name);  margin-bottom: 0.9rem; }
+  .hier-plug-name { font-size: 0.82rem; font-weight: 600; color: var(--plug-name); margin-bottom: 0.75rem; }
+  .hier-plugins { display: flex; flex-direction: column; gap: 0.65rem; }
+  .hier-plug {
+    background: var(--plug-bg);
+    border: 1.5px solid var(--plug-border);
+    border-radius: 13px;
+    padding: 0.8rem 0.85rem 0.85rem;
+    box-shadow: var(--shadow-plug);
+  }
+  .hier-plug-mcp { opacity: 0.72; border-style: dashed; }
+  .hier-skills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .hier-skill {
+    background: var(--skill-bg);
+    border: 1px solid var(--skill-border);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--skill-fg);
+    white-space: nowrap;
+  }
+  .hier-mcp-badge {
+    display: inline-block;
+    background: var(--skill-bg);
+    border: 1px solid var(--plug-border);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--plug-label);
+    margin-bottom: 0.4rem;
+  }
+  .hier-mcp-note { font-size: 0.68rem; font-style: italic; color: var(--plug-label); opacity: 0.8; }
+</style>
+
+<div class="hier-wrap">
+
+  <div class="hier-mkt">
+    <div class="hier-level-label">Marketplace</div>
+    <div class="hier-mkt-name">claude-plugins-official</div>
+    <div class="hier-plugins">
+      <div class="hier-plug">
+        <div class="hier-level-label">Plugin</div>
+        <div class="hier-plug-name">mattpocock-skills</div>
+        <div class="hier-skills">
+          <span class="hier-skill">tdd</span>
+          <span class="hier-skill">research</span>
+          <span class="hier-skill">code-review</span>
+          <span class="hier-skill">grilling</span>
+        </div>
+      </div>
+      <div class="hier-plug">
+        <div class="hier-level-label">Plugin</div>
+        <div class="hier-plug-name">skill-creator</div>
+        <div class="hier-skills">
+          <span class="hier-skill">skill-creator</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hier-mkt">
+    <div class="hier-level-label">Marketplace</div>
+    <div class="hier-mkt-name">your-lab-github</div>
+    <div class="hier-plugins">
+      <div class="hier-plug">
+        <div class="hier-level-label">Plugin</div>
+        <div class="hier-plug-name">lab-scrna-skills</div>
+        <div class="hier-skills">
+          <span class="hier-skill">qc-plots</span>
+          <span class="hier-skill">normalize</span>
+          <span class="hier-skill">cluster</span>
+          <span class="hier-skill">annotate-cells</span>
+          <span class="hier-skill">trajectory</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hier-mkt">
+    <div class="hier-level-label">Marketplace</div>
+    <div class="hier-mkt-name">rockefeller-brc</div>
+    <div class="hier-plugins">
+      <div class="hier-plug hier-plug-mcp">
+        <div class="hier-level-label">Plugin</div>
+        <div class="hier-plug-name">brc-bioinformatics</div>
+        <div class="hier-mcp-badge">MCP server</div>
+        <div class="hier-mcp-note">covered in a later lecture</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+```
+
+## Installing skills - Public marketplaces
+
+- **Install from a marketplace:** Marketplaces contain plugins, each of which has their own set of skills.
+
+::: {.columns}
+
+::: {.column width="50%"}
+In the app or the CLI, you can just type in `/plugin` and navigate through the options to add first add a marketplace and then install a plugin.
+:::
+
+::: {.column width="50%"}
+![](../imgs/plugin_menu.png){width=100% fig-align="center"}
+:::
+:::
+
+## Installing skills - Public marketplaces
+
+- **Install from a marketplace:** Marketplaces contain plugins, each of which has their own set of skills.
+
+You can also do this explicitly on the command line.
+
+Claude Code:
+```{shell, eval=FALSE}
+# add marketplace from any github repository
+/plugin marketplace add <owner>/<repo> # e.g. anthropics/claude-plugins-official 
+
+# install plugin from that marketplace
+/plugin install <plugin-name>@<marketplace-alias> # e.g. skill-creator@claude-plugins-official 
+```
+
+Codex:
+```{shell, eval=FALSE}
+/plugin marketplace add <owner>/<repo> # add marketplace
+/plugin add <plugin-name>@<marketplace-alias> # install plugin from that marketplace
+```
+
+## Installing skills - Single skill with npx
+
+- [**Install from a marketplace:** Marketplaces contain plugins, each of which has their own set of skills.]{style="color: grey;"}
+- **Add single skill with npx:** This essentially just copies in the skills directory to your computer where the model will find it. 
+
+```{shell, eval=FALSE}
+npx skills find
+npx skills add <owner>/<repo>
+```
+
+
+## Installing skills- Security
+
+It is imperative that you trust the source where you install or add skills from. Remember that the entire skill and its associated files are potentially read and run on your computer. 
+
+Many of your skills will likely be developed by you, but when it's not, its always important to read over all the files that come with a skill that you install. 
+
+
+## Popular plugin repositories
+
+ - [https://github.com/anthropics/skills](https://github.com/anthropics/skills)
+ - [https://github.com/mattpocock/skills](https://github.com/mattpocock/skills)
+ - [https://github.com/obra/superpowers](https://github.com/obra/superpowers)
+ - [https://github.com/GoekeLab/awesome-genomic-skills](https://github.com/GoekeLab/awesome-genomic-skills): good resource for bioinformatics or science-focused skills
+
+
+# Developing your own skills {#developing-skills .center .middle background-color="#23373B"}
+
+## Manually add a skills folder
+
+As we've discussed, a skill is at minimum a directory in an existing *.claude* or *.codex* directory that contains a SKILL.md file with a name, description, and body of instructions. 
+
+```{shell, eval=FALSE}
+# accessible to all projects on your system
+mkdir -p ~/.claude/skills/bioinformatics-skill 
+
+# accessible to only this project
+mkdir -p .claude/skills/bioinformatics-skill 
+```
+
+## Built-in skill creators
+
+Both Claude code and Codex have skills that help guide you though making a new skill (`/skill-creator` for Claude).
+
+- As with any skill, they will usually be activated when you ask the model to make a skill (e.g. *I'd like to make a skill that reads in scRNAseq data and makes initial QC plots*) 
+- These tools are designed to interview you to understand exactly what you want the skill to do. 
+- The quality of the follow up questions depends on how well represented that type of action is covered in the model (scRNAseq will result in better interview set up than a more obscure method)
+- can also explicitly call the skill: `/skill-creator <description of skill to make>`
+
+![](../imgs/run_skill_creator.png){width=100% fig-align="center"}
+
+
+## Building skills from your actual analysis
+
+In reality, your most useful skills will be made by the LLM, but are built from your actual analyses. The skill creator is designed to turn key discussion points within your session into facets of the skill.
+
+*e.g. Cell type X generally has higher mitochondrial reads, the starting threshold should be 10%, not 5%*
+
+This allows the model to identify packages you prefer, plot styles you like, important thresholds or quirks related to your studies, key decision points or edge cases, and to include this information in the skill. 
+
+Specifics related to your work increases the value of a skill beyond just simply asking the model to do that task with no skill present. 
+
+
+## Smaller skills vs entire workflow as skill
+
+Generally it's better to have smaller skills that define discrete tasks as opposed to having one skill do an entire workflow or pipeline. 
+
+::: {.columns}
+
+
+::: {.column width="50%"}
+[✔]{style="color: #2e7d32;"} **Separate skills**<br>[*\*usually better*]{style="font-size: 0.6em;"}
+```{=html}
+<pre class="tree">
+scrna-qc-skill/
+└── SKILL.md 
+scrna-clustering-skill/
+└── SKILL.md 
+scrna-de-skill/
+└── SKILL.md 
+</pre>
+```
+
+:::
+
+::: {.column width="50%"}
+[⚠]{style="color: #ef6c00;"} **Entire pipeline skill**<br>[*\*for fixed, standardized workflows*]{style="font-size: 0.6em;"}
+```{=html}
+<pre class="tree">
+scrna-pipeline-skill/
+├── SKILL.md          
+└── references/     
+    ├── qc.md
+    ├── clustering.md
+    └── de.md
+</pre>
+```
+:::
+
+:::
+
+## Example of skill used in practice
+
+Here is the file structure of an example review skill. It is designed to detect the type of analysis and then use the guidelines **only for that method** by reading the relevant markdown file in the *references* directory. 
+
+This allows for a univeral review skill that minimizes token usage by ignoring information for other methods. 
+
+```{=html}
+<pre class="tree">
+~/.claude/skills/bio-review
+├── SKILL.md
+└── references
+    ├── bulk_rnaseq.md
+    ├── clip_genelevel.md
+    ├── cutrun.md
+    ├── generic_code_quality.md
+    ├── proteomics.md
+    ├── riboseq.md
+    └── scrnaseq.md
+</pre>
+```
+
+## Example: bio-review SKILL.md
+
+```{=html}
+<style>
+.scroll-box {
+  max-height: 480px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 0.55em;
+}
+.scroll-box h1, .scroll-box h2, .scroll-box h3 { font-size: 1.2em; }
+</style>
+```
+
+```{r, echo=FALSE, results='asis'}
+skill <- readLines("../../data/bio-review-SKILL.md")
+yaml_end <- which(skill == "---")[2]
+skill_body <- paste(skill[(yaml_end + 1):length(skill)], collapse = "\n")
+skill_html <- commonmark::markdown_html(skill_body, extensions = TRUE)
+cat("```{=html}", "<div class='scroll-box'>", skill_html, "</div>", "```", sep = "\n")
+```
+
 
 ## Time for an exercise
 

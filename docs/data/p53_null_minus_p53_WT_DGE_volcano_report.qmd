@@ -1,0 +1,254 @@
+---
+title: "Differential expression: p53 null vs p53 WT"
+format:
+  html:
+    code-fold: true
+    embed-resources: true
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+<!--
+Purpose: Volcano plot and interactive results table for one DESeq2 contrast.
+Inputs:  de_file - a DESeq2 results table (CSV); column names are mapped via the *_col settings
+Outputs: rendered HTML with a genes-by-direction table, a labelled volcano plot (also saved as a
+         PDF), and an interactive (DT) table of all tested genes
+-->
+
+```{r}
+#| label: setup
+#| include: false
+library(tidyverse)
+```
+
+```{r}
+#| label: settings
+#| code-summary: "Code - Define parameters"
+de_file <- "p53_null_minus_p53_WT_DGEanalysisUnfiltered.csv"
+numerator <- "p53 null"
+denominator <- "p53 WT"
+project_name <- "P53 KO in breast cancer cells - RNAseq"
+
+# Column names in de_file; set an optional one to "" if the table lacks it.
+id_col <- "ID"
+symbol_col <- "Symbol"
+basemean_col <- "baseMean"
+lfc_col <- "log2FoldChange"
+lfcse_col <- "lfcSE"
+pvalue_col <- "pvalue"
+padj_col <- "padj"
+
+padj_cutoff <- 0.05
+lfc_cutoff <- 1
+n_labels <- 5
+
+up_color <- "#008300"
+down_color <- "#6250d6"
+ns_color <- "#c3c2b7"
+
+volcano_pdf <- str_c(tools::file_path_sans_ext(de_file), "_volcano.pdf")
+```
+
+::: {.lead}
+Project: `r project_name`\
+`r format(Sys.Date(), "%B %d, %Y")`\
+Lab: Bioinformatics Resource Center
+:::
+
+```{r}
+#| label: load
+#| code-summary: "Code - Load DESeq2 results"
+de_raw <- read_csv(de_file)
+```
+
+```{r}
+#| label: prep
+#| code-summary: "Code - Classify genes and pick labels"
+up_label <- str_glue("Up in {numerator}")
+down_label <- str_glue("Down in {numerator}")
+
+direction_colors <- c(down_color, ns_color, up_color)
+names(direction_colors) <- c(down_label, "Not significant", up_label)
+
+# Map whatever the input calls its columns onto fixed names; optional columns that are absent
+# (e.g. no symbol or lfcSE) are simply skipped.
+col_map <- c(
+  ID = id_col,
+  Symbol = symbol_col,
+  baseMean = basemean_col,
+  log2FoldChange = lfc_col,
+  lfcSE = lfcse_col,
+  pvalue = pvalue_col,
+  padj = padj_col
+)
+col_map <- col_map[!is.na(col_map) & col_map != "" & col_map %in% names(de_raw)]
+
+de_std <- de_raw %>%
+  select(all_of(col_map))
+
+if (!"Symbol" %in% names(de_std)) {
+  de_std <- mutate(de_std, Symbol = ID)
+}
+
+# padj of exactly 0 (p-value underflow) would give -log10 = Inf and fall off the plot, so cap
+# those at the smallest non-zero padj in the table.
+min_nonzero_padj <- min(de_std$padj[de_std$padj > 0], na.rm = TRUE)
+
+# Genes with NA padj were removed by DESeq2's independent filtering / outlier detection; they
+# carry no testable significance, so they are dropped rather than plotted as non-significant.
+de_plot <- de_std %>%
+  filter(!is.na(padj), !is.na(log2FoldChange)) %>%
+  mutate(
+    Symbol = coalesce(Symbol, ID),
+    padj_capped = pmax(padj, min_nonzero_padj),
+    neg_log10_padj = -log10(padj_capped),
+    direction = case_when(
+      padj < padj_cutoff & log2FoldChange >= lfc_cutoff ~ up_label,
+      padj < padj_cutoff & log2FoldChange <= -lfc_cutoff ~ down_label,
+      TRUE ~ "Not significant"
+    ),
+    direction = factor(direction, levels = c(down_label, "Not significant", up_label))
+  )
+
+top_genes <- de_plot %>%
+  filter(direction != "Not significant") %>%
+  group_by(direction) %>%
+  slice_min(padj_capped, n = n_labels, with_ties = FALSE) %>%
+  ungroup()
+```
+
+## Genes by direction
+
+```{r}
+#| label: direction_counts
+#| code-summary: "Code - Count genes by direction"
+direction_counts <- de_plot %>%
+  count(direction, .drop = FALSE) %>%
+  mutate(
+    swatch = direction_colors[as.character(direction)],
+    Direction = as.character(
+      str_glue("<span style=\"color: {swatch}; font-weight: bold;\">{direction}</span>")
+    ),
+    Genes = scales::comma(n),
+    `% of tested` = scales::percent(n / sum(n), accuracy = 0.1)
+  )
+
+total_row <- tibble(
+  Direction = "<b>Total tested</b>",
+  Genes = scales::comma(sum(direction_counts$n)),
+  `% of tested` = "100%"
+)
+
+direction_counts %>%
+  select(Direction, Genes, `% of tested`) %>%
+  bind_rows(total_row) %>%
+  knitr::kable(
+    format = "html",
+    escape = FALSE,
+    align = c("l", "r", "r"),
+    table.attr = "class=\"table table-condensed\" style=\"width: auto;\""
+  )
+```
+
+## Volcano plot
+
+```{r}
+#| label: volcano
+#| code-summary: "Code - Draw volcano and save PDF"
+#| fig-width: 8
+#| fig-height: 6
+volcano <- ggplot(de_plot, aes(x = log2FoldChange, y = neg_log10_padj, color = direction)) +
+  geom_point(data = filter(de_plot, direction == "Not significant"), size = 0.8, alpha = 0.5) +
+  geom_point(data = filter(de_plot, direction != "Not significant"), size = 1.2, alpha = 0.8) +
+  geom_vline(xintercept = c(-lfc_cutoff, lfc_cutoff),
+             linetype = "dashed", color = "grey60", linewidth = 0.4) +
+  geom_hline(yintercept = -log10(padj_cutoff),
+             linetype = "dashed", color = "grey60", linewidth = 0.4) +
+  scale_color_manual(values = direction_colors, drop = FALSE) +
+  labs(
+    title = str_glue("{numerator} vs {denominator}"),
+    subtitle = str_glue(
+      "padj < {padj_cutoff}, |log2FC| ≥ {lfc_cutoff} ({2^lfc_cutoff}-fold)"
+    ),
+    x = str_glue("log2 fold change ({numerator} / {denominator})"),
+    y = "-log10 adjusted p-value",
+    color = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "top",
+    panel.grid.minor = element_blank()
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))
+
+if (requireNamespace("ggrepel", quietly = TRUE)) {
+  volcano <- volcano +
+    ggrepel::geom_label_repel(
+      data = top_genes,
+      aes(label = Symbol),
+      color = "black",
+      fill = "white",
+      label.size = 0.2,
+      size = 3,
+      max.overlaps = Inf,
+      min.segment.length = 0,
+      show.legend = FALSE
+    )
+} else {
+  volcano <- volcano +
+    geom_label(data = top_genes, aes(label = Symbol), color = "black", fill = "white",
+               size = 3, vjust = -0.4, show.legend = FALSE)
+}
+
+# cairo_pdf can encode the "≥" in the subtitle; the base pdf device can't and substitutes dots.
+if (capabilities("cairo")) {
+  pdf_device <- cairo_pdf
+} else {
+  pdf_device <- "pdf"
+}
+ggsave(volcano_pdf, volcano, device = pdf_device, width = 8, height = 6)
+
+volcano
+```
+
+## All results (interactive)
+
+```{r}
+#| label: results_table
+#| code-summary: "Code - Build results table"
+results_table <- de_plot %>%
+  select(any_of(c("Symbol", "ID", "direction", "baseMean", "log2FoldChange", "lfcSE",
+                  "pvalue", "padj"))) %>%
+  arrange(padj)
+
+round_cols <- intersect(c("baseMean", "log2FoldChange", "lfcSE"), names(results_table))
+signif_cols <- intersect(c("pvalue", "padj"), names(results_table))
+
+if (requireNamespace("DT", quietly = TRUE)) {
+  DT::datatable(
+    results_table,
+    rownames = FALSE,
+    filter = "top",
+    extensions = "Buttons",
+    options = list(
+      pageLength = 25,
+      dom = "Bfrtip",
+      buttons = c("copy", "csv", "excel")
+    )
+  ) %>%
+    DT::formatRound(round_cols, digits = 2) %>%
+    DT::formatSignif(signif_cols, digits = 3)
+} else {
+  knitr::kable(head(results_table, 50), digits = 3)
+}
+```
+
+## Session info
+
+```{r}
+#| label: session_info
+#| code-summary: "Code - Session info"
+sessionInfo()
+```
