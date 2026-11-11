@@ -2,13 +2,22 @@
 title: "Responsible Use of Agentic AI: Adversarial Review"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
+format:
+  revealjs:
+    slide-number: true
+    embed-resources: true
 ---
 
 ```{r setup, include=FALSE, purl=FALSE}
 suppressPackageStartupMessages(require(knitr))
 knitr::opts_chunk$set(echo = TRUE, tidy = T)
+```
+
+```{r figsetup, include=FALSE, purl=FALSE}
+suppressPackageStartupMessages(library(ggplot2))
+# Course colours: dark teal #23373B, orange #EB811B; mid teal #4E9BAA as a third category
+ru_dark <- "#23373B"; ru_orange <- "#EB811B"; ru_mid <- "#4E9BAA"
 ```
 
 ::: {.content-hidden when-format="revealjs"}
@@ -17,25 +26,351 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Overview
 
-- [Why review AI output adversarially?](#why-review-ai-output-adversarially)
-- [Running an adversarial review](#running-an-adversarial-review)
-- [Limits of AI reviewing AI](#limits-of-ai-reviewing-ai)
-- [Exercises](#time-for-an-exercise)
+```{=html}
+<style>
+.reveal .slides section.compact { font-size: 0.85em; }
+/* Title slide: long title + blank lines around the orange rule pushed the email off the slide */
+#title-slide .title { font-size: 1.6em; }
+#title-slide br { display: none; }
+#title-slide hr { margin: 0.4em auto; }
+</style>
+```
 
-# Adversarial Review {background-color="#23373B" .center .middle}
+- [Why review AI output?](#llms-are-often-confident-but-wrong)
+- [What is adversarial review?](#what-is-adversarial-review)
+- [Why not ask the same AI?](#cant-i-just-ask-ai-to-check-its-own-work)
+- [What the evidence says](#in-conclusion)
+- [A worked example](#example-an-ai-written-analysis-for-illustrative-purposes)
+- [How to do it](#adversarial-review-workflow)
+- [BRC's code reviewer](#get-your-analysis-checked-at-the-brc)
 
-## Why review AI output adversarially?
+## LLMs are often confident, but wrong {.compact}
 
-??Asking a model (ideally a fresh session or a different model) to find faults in work rather than confirm it; sycophancy and confirmation bias??
+::: {.columns}
+::: {.column width="45%"}
+ChatGPT-3.5 was asked to write 30 short medical papers with references.
 
-## Running an adversarial review
+However, it 'hallucinated' up to 93% of the references, often just making up papers with wrong PMIDs, wrong volume numbers, and wrong page numbers.
+You wouldn't know that these were fabricated from reading the AI output, but a closer look often shows the gaps and inconsistencies.
+:::
+::: {.column width="55%"}
+```{r waffle, echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=4.2, fig.alt="Waffle chart of 100 squares: 47 fabricated references, 46 real but inaccurate, 7 real and accurate."}
+cats <- c("Fabricated (47%)", "Real, details wrong (46%)", "Real and accurate (7%)")
+w <- data.frame(x = rep(1:10, times = 10), y = rep(10:1, each = 10),
+                cat = factor(rep(cats, times = c(47, 46, 7)), levels = cats))
+ggplot(w, aes(x, y, fill = cat)) +
+  geom_tile(width = 0.88, height = 0.88) +
+  scale_fill_manual(values = c(ru_orange, ru_mid, ru_dark), name = NULL) +
+  coord_equal() +
+  labs(title = "Every 100 references ChatGPT gave") +
+  theme_void(base_size = 14) +
+  theme(legend.position = "bottom", legend.direction = "vertical",
+        plot.title = element_text(face = "bold", hjust = 0.5))
+```
+:::
+:::
 
-??Prompts and workflows for red-teaming an analysis, document or piece of code; verifying each reported issue before acting on it??
+::: {style="font-size: 50%; color: #666666;"}
+*Bhattacharyya et al. 2023, "High Rates of Fabricated and Inaccurate References in ChatGPT-Generated Medical Content", Cureus. [doi:10.7759/cureus.39238](https://doi.org/10.7759/cureus.39238)*
+:::
 
-## Limits of AI reviewing AI
 
-??Shared blind spots, false positives, and why the human remains the final check??
+## Asleep at the wheel? {.compact}
 
-## Time for an exercise
+When asked to write secure code, cybersecurity professionals using an AI assistant often wrote less secure code than their counterparts without it: 
 
-Exercises are available [here](../exercises/exercises/Exercise_Adversarial_Review_exercise.html).
+- They were also more likely to believe it was secure
+- People who relied on the AI less made fewer mistakes
+- It's easy to skim AI output and miss due diligence details
+
+Confident output makes us check less, so outside review needs to be careful.
+
+::: {style="font-size: 50%; color: #666666;"}
+*Perry et al. 2023, "Do Users Write More Insecure Code with AI Assistants?" [arXiv:2211.03622](https://arxiv.org/abs/2211.03622)*
+:::
+
+
+## What is adversarial review?
+
+Basically, a second pass whose job is to find problems + assumptions, flaws, and gaps.
+
+- The AI does the work, then an *independent* reviewer looks for what's wrong
+- The reviewer can be a different AI model, or a fresh AI session 
+- You're still the "final backstop", the person who decides which problems are real and what to fix 
+- Same idea as peer review: *"what's wrong with this?"*
+
+
+## Some background {.compact}
+
+::: {.columns}
+::: {.column width="33%"}
+**Red teaming**
+
+From military simulations, you make two squads and try to get them to outsmart the other and expose weaknesses.
+One AI writes test cases designed to make another AI fail.
+:::
+::: {.column width="33%"}
+**Debate**
+
+Two AIs argue opposite sides, try to convince each other, a dialectical approach; a human judges who is right.
+:::
+::: {.column width="33%"}
+**Critic models**
+
+AIs trained with human feedback to critique code caught more bugs than paid human code reviewers on their own.
+:::
+:::
+
+::: {style="font-size: 50%; color: #666666;"}
+*Perez et al. 2022, "Red Teaming Language Models with Language Models". [arXiv:2202.03286](https://arxiv.org/abs/2202.03286)*<br>
+*Irving et al. 2018, "AI safety via debate". [arXiv:1805.00899](https://arxiv.org/abs/1805.00899)*<br>
+*McAleese et al. 2024, "LLM Critics Help Catch LLM Bugs". [arXiv:2407.00215](https://arxiv.org/abs/2407.00215)*
+:::
+
+## Can't I just ask AI to check its own work? {.compact}
+
+- No. "Are you sure?" in the same chat means the model re-judges its own answer with its same context and struggles to identify a problem
+- Sometimes it'll guess and switch a right answer to a wrong one, misleading you further
+- Without outside feedback and examination, models (like people) struggle to correct their own reasoning and spot their own errors
+  
+
+::: {style="font-size: 50%; color: #666666;"}
+*Huang et al. 2023, "Large Language Models Cannot Self-Correct Reasoning Yet". [arXiv:2310.01798](https://arxiv.org/abs/2310.01798)*<br>
+*Kamoi et al. 2024, "When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs". [arXiv:2406.01297](https://arxiv.org/abs/2406.01297)*
+:::
+
+## But why? {.compact}
+
+::: {.columns}
+::: {.column width="50%"}
+**Self-preference**
+
+Models can readily recognise their own writing, and score it higher than other models' work and human-generated output, even when the other outputs are better. Models are also biased toward longer, more verbose answers.
+:::
+::: {.column width="50%"}
+**Sycophancy**
+
+As previously discussed, one common problem is sycophancy:
+AI assistants tend to give answers that match what the user already believes, they want to make you happy.
+:::
+:::
+
+So: use a fresh session or a different model as the impartial reviewer, and avoid priming and biasing it with your own ideas.
+
+::: {style="font-size: 50%; color: #666666;"}
+*Panickssery et al. 2024, "LLM Evaluators Recognize and Favor Their Own Generations". [arXiv:2404.13076](https://arxiv.org/abs/2404.13076)*<br>
+*Sharma et al. 2023, "Towards Understanding Sycophancy in Language Models". [arXiv:2310.13548](https://arxiv.org/abs/2310.13548)*
+:::
+
+## Self-critique on its own is faulty {.compact}
+
+::: {.columns}
+::: {.column width="50%"}
+GPT-4 was tested on various mathematical puzzles and planning tasks and scored:
+
+- When it critiqued its own answers, performance collapsed, switched right moves to wrong and didn't fix wrong.
+- Often suffered from compounding and stacked errors.
+- When an outside verifier (e.g. a constraint checker, a logical gate checker) checked them, performance improved
+:::
+::: {.column width="50%"}
+For you, a "verifier" can be:
+
+- Running the code/markdown and comparing, check outputs
+- Checking the output on a small subset where you know the answer (e.g. a control or benchmark, reproduce someone else's work)
+
+:::
+:::
+
+::: {style="font-size: 50%; color: #666666;"}
+*Stechly et al. 2024, "On the Self-Verification Limitations of Large Language Models on Reasoning and Planning Tasks". [arXiv:2402.08115](https://arxiv.org/abs/2402.08115)*
+:::
+<!-- 
+## Method and biology: you are the reviewer
+
+::: {.columns}
+::: {.column width="55%"}
+```{r spot, echo=FALSE, purl=FALSE, fig.width=5.8, fig.height=3, fig.alt="Bar chart: the best model found at most 21 percent of real errors in published papers, and at most 6 percent of its flags were real errors."}
+sp <- data.frame(what = factor(c("Real errors it found", "Its flags that were real errors"),
+                               levels = c("Its flags that were real errors", "Real errors it found")),
+                 pct = c(21.1, 6.1))
+ggplot(sp, aes(pct, what)) +
+  geom_col(aes(x = 100), fill = "grey90", width = 0.6) +
+  geom_col(fill = ru_orange, width = 0.6) +
+  geom_text(aes(label = paste0(round(pct), "%")), hjust = -0.2, size = 6, fontface = "bold") +
+  scale_x_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
+  labs(x = NULL, y = NULL, title = "Best AI model on 91 real errors in papers") +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid = element_blank(), axis.text.x = element_blank(),
+        plot.title = element_text(face = "bold", size = 13), plot.title.position = "plot")
+```
+:::
+::: {.column width="45%"}
+- 83 published papers with 91 errors serious enough to cause corrections or retractions
+- Across repeated runs, models rarely found the same errors twice
+- We found no benchmark for AI reviewing a bioinformatics analysis or its biology
+
+The more the check depends on the method and the biology, the more it is yours.
+:::
+:::
+
+::: {style="font-size: 50%; color: #666666;"}
+*Son et al. 2025, "When AI Co-Scientists Fail: SPOT — a Benchmark for Automated Verification of Scientific Research". [arXiv:2505.11855](https://arxiv.org/abs/2505.11855)*
+:::
+-->
+
+## In conclusion {.smaller .scrollable}
+
+| Approach | Verdict |
+|---|---|
+| Checking against something real (run it, test it, known answer) | Works best |
+| An independent reviewer (fresh session or different model) | Helps |
+| Asking specific questions ("find the error in...") | Helps |
+| Several AIs debating | Mixed: often no better than simpler methods |
+| Same AI, same chat, "are you sure?" | Weak |
+
+YMMV with different approaches and models.
+
+## Example: an AI-written analysis for illustrative purposes {.smaller}
+
+::: {.columns}
+::: {.column width="52%"}
+Mouse liver, standard vs high-fat diet, 3 mice per group.
+
+*Methods:* "Genes with padj < 0.05 and |log2FC| > 1 were called differentially expressed."
+
+```r
+txi    <- tximport(files, type = "salmon", tx2gene = tx2gene)
+counts <- round(txi$abundance)
+dds    <- DESeqDataSetFromMatrix(counts, samples,
+                                 design = ~ seq_run + diet)
+dds    <- DESeq(dds)
+res    <- lfcShrink(dds, coef = "diet_HFD_vs_standard",
+                    type = "apeglm")
+sig    <- subset(res, padj < 0.05)
+```
+:::
+::: {.column width="48%"}
+| gene   | log2FC | pvalue  | padj    |
+|--------|-------:|--------:|--------:|
+| Cidea  |   4.20 | 1.2e-14 | 2.3e-10 |
+| Ddx3y  |   6.30 | 8.1e-11 | 3.6e-07 |
+| Kdm5d  |   5.90 | 1.6e-08 | 3.8e-05 |
+| Pparg  |   1.20 | 3.0e-03 | 8.0e-04 |
+
+*Results:* "The most strongly induced gene was *Cidea* (4.2-fold) … *Pparg* was also significantly increased (padj = 8.0e-04)."
+
+Does it look fine to you?
+:::
+:::
+
+::: {style="font-size: 50%; color: #666666;"}
+*Constructed by BRC for illustrative purposes*
+:::
+
+
+## Compare and contrast the outputs you might get {.smaller}
+
+::: {.columns}
+::: {.column width="50%"}
+**Quick check**: *"Does this look OK?"*
+
+> This looks like a solid, standard pipeline! Adjusting for sequencing run is a nice touch.
+>
+> One small thing: a log2FC of 4.2 is about 18-fold, not 4.2-fold.
+>
+> Want me to polish the wording?...
+:::
+::: {.column width="50%"}
+**Adversarial review**: *new chat, "find the problems"*
+
+> ::: {.nonincremental}
+> 1. `txi$abundance` is TPM, not counts. DESeq2 needs counts.
+> 2. The methods say |log2FC| > 1, but the code never applies it.
+> 3. *Pparg*: an adjusted p-value can't be smaller than its raw p-value.
+> 4. *Ddx3y* and *Kdm5d* are Y-linked. Do the groups differ in sex?
+> :::
+:::
+:::
+
+::: {style="font-size: 50%; color: #666666;"}
+*Constructed by BRC for teaching*
+:::
+
+
+## Where does HI (human intelligence) come in? {.compact}
+
+::: {.columns}
+::: {.column width="50%"}
+AI flagged the chrY issue, you could check your lab notebook: all six mice were actually female.
+
+- *Ddx3y* and *Kdm5d* are on the Y chromosome. Female mice shouldn't express them at all. Was a sample mislabelled or contaminated?
+- The AI can only point it out, it doesn't have the full context of what you did and how and why. 
+:::
+::: {.column width="50%"}
+Ask yourself what information the AI has access to and no access to:
+
+- What do you know that isn't on the page?
+- Who checks the reviewer?
+:::
+:::
+
+::: {style="font-size: 50%; color: #666666;"}
+*Chromosome locations: NCBI Gene [Ddx3y (26900)](https://www.ncbi.nlm.nih.gov/gene/26900), [Kdm5d (20592)](https://www.ncbi.nlm.nih.gov/gene/20592), Mus musculus.*
+:::
+
+
+## Adversarial review workflow {.compact}
+
+1. List what needs checking: each claim, number and step
+2. Check each item in a fresh chat or a different model, without your biases and preconceptions 
+3. Ask specific questions ("find the error in...") rather than "review this"
+4. Ground it: run it, test it, compare to a known answer
+5. You make the final call
+
+::: {style="font-size: 50%; color: #666666;"}
+*Dhuliawala et al. 2023, "Chain-of-Verification Reduces Hallucination in Large Language Models". [arXiv:2309.11495](https://arxiv.org/abs/2309.11495)*<br>
+*Liu & Shah 2023, "ReviewerGPT? An Exploratory Study on Using Large Language Models for Paper Reviewing". [arXiv:2306.00622](https://arxiv.org/abs/2306.00622)*
+:::
+
+
+## Key takeaways {.compact}
+
+- AI output sounds confident and fluent whether or not it is right, so it needs human intelligence as a failsafe.
+- Asking the same AI in the same chat is not a review, it remembers its previous assumptions and notes so it's "cheating"
+- Use a separate reviewer and ask specific questions
+- Machines can check "does it run" and "does it match"; you have to check the method and the biology and if it's reasonable
+
+## Get your analysis checked at the BRC {.compact .nostretch}
+
+biocritic is the BRC's (currently in progress) AI reviewer for R and Python analyses, run entirely at Rockefeller on local models.
+
+::: {.columns}
+::: {.column width="50%"}
+Can catch
+
+- off-by-one errors
+- multiple testing errors
+- data leakage
+- and others!
+:::
+::: {.column width="50%"}
+[84%]{style="font-size: 200%; color: #EB811B;"} of planted errors caught in test code
+
+```{r caught, echo=FALSE, purl=FALSE, fig.width=4.4, fig.height=1.4, fig.alt="Waffle chart of 38 squares: 32 planted errors caught, 6 missed."}
+n_caught <- 32; n_missed <- 6; n <- n_caught + n_missed
+wf <- data.frame(x = (seq_len(n) - 1) %% 10 + 1, y = -((seq_len(n) - 1) %/% 10),
+                 cat = factor(rep(c("Caught", "Missed"), times = c(n_caught, n_missed)),
+                              levels = c("Caught", "Missed")))
+ggplot(wf, aes(x, y, fill = cat)) +
+  geom_tile(width = 0.88, height = 0.88) +
+  scale_fill_manual(values = c(ru_orange, "grey80"), name = NULL) +
+  coord_equal() +
+  theme_void(base_size = 13) +
+  theme(legend.position = "right")
+```
+:::
+:::
+
+Want your code checked? [brc@rockefeller.edu](mailto:brc@rockefeller.edu)
+
+
