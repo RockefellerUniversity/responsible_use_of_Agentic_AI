@@ -461,7 +461,10 @@ This allows for a univeral review skill that minimizes token usage by ignoring i
 ```
 
 ```{r, echo=FALSE, results='asis'}
-skill <- readLines("../data/bio-review-SKILL.md")
+## The engine runs chunks from the project root (execute-dir: project), where the
+## file is at data/; a standalone render from notebooks/ finds it at ../data/.
+skillPath <- if (file.exists("data/bio-review-SKILL.md")) "data/bio-review-SKILL.md" else "../data/bio-review-SKILL.md"
+skill <- readLines(skillPath)
 yaml_end <- which(skill == "---")[2]
 skill_body <- paste(skill[(yaml_end + 1):length(skill)], collapse = "\n")
 skill_html <- commonmark::markdown_html(skill_body, extensions = TRUE)

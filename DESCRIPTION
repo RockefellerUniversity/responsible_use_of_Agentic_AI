@@ -1,7 +1,7 @@
 Package: ResponsibleAgenticAI
 Type: Package
 Title: Responsible Use of Agentic AI
-Version: 2.0.0
+Version: 1.0.0
 Author: Matt Paul and Thomas Carroll.
 Maintainer: Thomas Carroll <tc.infomatics@gmail.com>
 Description: Dependency + system-requirements manifest for the course. The course
@@ -11,6 +11,6 @@ Description: Dependency + system-requirements manifest for the course. The cours
     they can be installed and listed on the front page.
 License: GPL (>= 2)
 Depends: methods
-Imports: ggplot2, dplyr, ggrepel, scales
+Imports: ggplot2, dplyr, ggrepel, scales, commonmark
 SystemRequirements: LLM.GUI
 biocViews: Training
