@@ -3355,12 +3355,12 @@ Bioinformatics Resource Center - Rockefeller University<p></p>
 <ul>
 <li><strong>Remote</strong> server: <code>https://mcp.context7.com/mcp</code>. A free API key gives higher rate limits.</li>
 <li>Two tools: <code>resolve-library-id</code> finds the library, then <code>query-docs</code> fetches the docs.</li>
-<li>Add “use context7” to a prompt, or name the library directly: “use library /satijalab/seurat”.</li>
+<li>Add “use context7” to a prompt, or name the library directly: “use library /aertslab/scenicplus”.</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource shell number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href></a>claude mcp add --transport http context7 https://mcp.context7.com/mcp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Best for packages that change quickly, or that had a major release after the model’s training cutoff.</p>
+<p>Best for packages that change quickly, or that had a major release after the model’s training cutoff, like the SCENIC+ update the model could not see.</p>
 <aside class="notes">
 <p>Context7’s own setup tool is <code>npx ctx7 setup</code>, which also installs a skill. The plain <code>claude mcp add</code> line is shown so students see what is actually configured. Its queries go to Upstash’s servers: fine for public package names, but don’t paste unpublished text into a docs query.</p>
 <style type="text/css">
