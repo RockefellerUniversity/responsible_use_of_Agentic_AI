@@ -1,3 +1,32 @@
+## %%{init: {"themeVariables": {"fontSize": "30px"}, "flowchart": {"padding": 30, "wrappingWidth": 500}}}%%
+## flowchart LR
+##   A["'Run initial QC on
+## my scRNA-seq data'"] --> B["SKILL.md
+## detect input format"]
+##   B -->|".h5ad (AnnData)"| C["references/qc_scanpy.md
+## scripts/qc_scanpy.py"]
+##   B -->|"10x .h5 / mtx"| Q{"Ask user:
+## R or Python?"}
+##   B -->|".rds (Seurat)"| D["references/qc_seurat.md
+## scripts/qc_seurat.R"]
+##   Q -->|Python| C
+##   Q -->|R| D
+##   C --> G["QC report
+## genes, counts, % mito"]
+##   D --> G
+## 
+##   classDef skill fill:#fde3cc,stroke:#EB811B,color:#5a2d00
+##   classDef ref fill:#e8daf7,stroke:#a97de0,color:#4a1e8a
+##   classDef script fill:#d6e8fa,stroke:#7ab4e8,color:#1a3d6b
+##   class B skill
+##   class C,D ref
+
+## # accessible to all projects on your system
+## mkdir -p ~/.claude/skills/bioinformatics-skill
+## 
+## # accessible to only this project
+## mkdir -p .claude/skills/bioinformatics-skill
+
 ## # add marketplace from any github repository
 ## /plugin marketplace add <owner>/<repo> # e.g. anthropics/claude-plugins-official
 ## 
@@ -9,18 +38,3 @@
 
 ## npx skills find
 ## npx skills add <owner>/<repo>
-
-## # accessible to all projects on your system
-## mkdir -p ~/.claude/skills/bioinformatics-skill
-## 
-## # accessible to only this project
-## mkdir -p .claude/skills/bioinformatics-skill
-
-## The engine runs chunks from the project root (execute-dir: project), where the
-## file is at data/; a standalone render from notebooks/ finds it at ../data/.
-skillPath <- if (file.exists("data/bio-review-SKILL.md")) "data/bio-review-SKILL.md" else "../data/bio-review-SKILL.md"
-skill <- readLines(skillPath)
-yaml_end <- which(skill == "---")[2]
-skill_body <- paste(skill[(yaml_end + 1):length(skill)], collapse = "\n")
-skill_html <- commonmark::markdown_html(skill_body, extensions = TRUE)
-cat("```{=html}", "<div class='scroll-box'>", skill_html, "</div>", "```", sep = "\n")
