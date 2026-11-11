@@ -1,0 +1,121 @@
+---
+title: "Exercise: AI in Your Workflow"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/"
+format:
+  html:
+    theme:
+      - cosmo
+      - metropolis-page.scss    # same RU look as the single-page presentations
+    embed-resources: true
+    format-links: false
+    include-before-body: page-logo.html
+params:
+  toMessage: false
+---
+
+```{r, setup, include=FALSE, purl=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage), params$toMessage, FALSE)
+```
+
+<p>&nbsp;</p>
+These exercises practice the habits behind a good AI workflow: planning, checkpoints, reproducibility, reviewing code you can't read, and setting hard lines.
+
+In these exercises we will talk through a dummy dataset from [Bioconductor](https://bioconductor.org/packages/release/data/experiment/html/airway.html). It is RNAseq data for human airway cells treated with dexamethasone. 
+
+**Exercise 1** - **Plan first, then decide who decides** 
+
+- Open a new project folder in your AI app and give it the public dataset. **Do not ask for any analysis yet.**
+- Ask the assistant to help you write `plan.md` for a differential expression analysis of the dataset: the questions, the software, the reference, and the ordered steps (QC, filtering, normalization, testing, reporting).
+- Mark up each line of the plan with one of three tags: **[me]** (a scientific choice I made or agree with), **[AI]** (the model chose it and I haven't thought about it), **[CHECK]** (I need to verify it from a trusted source).
+- Open a **fresh** session, give it only `plan.md`, and ask it to critique the plan. What did it add? What did it challenge? Did it flag any of your [me] decisions as risky?
+
+```{asis, echo=toMessage}
+Look for:
+
+- Choices the model made silently that are really scientific decisions: the filtering threshold, the normalization, the test, the design formula, which samples to include, the multiple-testing method.
+- Whether the [CHECK] items were checked against documentation (for example the DESeq2 vignette), not against the model.
+- The fresh-session critique is a useful second opinion, but its agreement is not proof: both sessions share the same model and training data.
+
+A well-marked plan has few [AI] tags left by the end. Each remaining one is a decision to revisit before running anything.
+```
+
+**Exercise 2** - **Write down what you expect before you run it** 
+
+- Choose the QC step from your plan. **Before** running anything, write down 5 expectations in a table: what the distribution of counts should look like, whether the data should be logged, how many genes you expect to survive filtering, which sample groups should cluster together, and one gene whose behavior you can predict.
+- Ask the assistant to write and run the QC step **on a subset of the data only** (for example 1,000 genes), saving the code in `scripts/`.
+- Compare the output with your table. Mark each expectation **met**, **not met** or **can't tell**.
+- For one unmet expectation, find out why. Is it the data, the code, or your expectation?
+
+```{asis, echo=toMessage}
+The aim is to practice having expectations independent of the model. Typical surprises include:
+
+- Counts that are already normalized or logged when you expected raw counts.
+- A filter that removes far more or fewer genes than expected.
+- A sample that doesn't cluster with its group.
+
+Good answers trace each surprise to something concrete: a column in the sample sheet, a threshold in the code, or the file that was read. Participants who couldn't write expectations are showing exactly the knowledge gap the slides say to close by reading, using a published dataset, or asking a bioinformatician.
+```
+
+**Exercise 3** - **Reproducibility replay**
+
+- Write one clear prompt for a small step, for example "Write an R script that reads `data/counts.csv` and `data/coldata.csv` and makes a PCA plot of the samples coloured by treatment."
+- Run it in **two fresh sessions** with the same prompt and the same project folder (copy the folder to two places). Compare the two sets of code and outputs, for example with a side-by-side diff or by asking the assistant to compare them.
+- List every difference. Which ones change the science (transformation, filtering, number of genes, colours that imply meaning) and which are cosmetic?
+- Now list what a colleague would need to reproduce your work without access to your chat. Tick which of these you currently have: the code, the plan, the software environment with exact versions, the model name and version, the prompt or a transcript, the raw data, the random seed.
+
+```{asis, echo=toMessage}
+Expect differences even with identical prompts: the output is sampled, so wording, defaults and choices can vary (for example log transform or variance stabilizing transform, number of top genes used for the PCA, plot styling). Some differences are cosmetic, but a different transformation or filter changes what the PCA shows.
+
+Minimum artifacts: the saved code (this is what makes the work reproducible, not the chat), a record of exact package and tool versions (an `environment.yml` or `renv.lock`, `sessionInfo()`), the model name and version used, the plan, the raw data, and a seed for anything stochastic. A transcript of the chat is helpful for provenance but is not enough on its own.
+
+The central point: reproduce from the code, not from the conversation.
+```
+
+**Exercise 4** - **Reviewing code you can't read**
+
+Setup: this uses the same airway dataset as the previous exercises (`data/counts.csv` and `data/coldata.csv`): human airway smooth muscle cells from 4 cell lines, each with and without dexamethasone. The sample sheet columns are `cell` (cell line) and `dex` (`untrt` or `trt`). An assistant produced the script below. The analysis itself runs, but the script stops with an error at the annotation step. It contains several problems, so think about what the right fix is before changing anything.
+
+```r
+library(DESeq2)
+library(org.Mm.eg.db)
+
+counts  <- read.csv("/Users/jsmith/Desktop/counts.csv", row.names = 1)
+coldata <- read.csv("data/coldata.csv", row.names = 1)
+
+counts  <- counts[, -3]
+coldata <- coldata[-3, ]
+
+dds <- DESeqDataSetFromMatrix(counts, coldata, design = ~ dex)
+dds <- dds[rowSums(counts(dds)) > 100, ]
+dds <- DESeq(dds)
+
+res <- results(dds, contrast = c("dex", "untrt", "trt"))
+sig <- subset(as.data.frame(res), pvalue < 0.05)
+
+sig$symbol <- mapIds(org.Mm.eg.db, rownames(sig), "SYMBOL", "ENSEMBL")
+write.csv(sig, "sig_genes.csv")
+```
+
+Work through the techniques from the slides **in order**, noting what each one found:
+
+1. **Ask for annotation.** Ask an assistant to explain the script line by line. Which problems were obvious from the explanation and which weren't?
+2. **Run it** on the data and look at the output file. Does anything look odd?
+3. **Look it up.** Check the arguments and the contrast in the DESeq2 documentation. Check which organism the annotation package is for.
+4. **Adversarial review.** In a fresh session, ask the assistant to act as a skeptical reviewer and list problems. Compare with your list.
+
+```{asis, echo=toMessage}
+Planted problems:
+
+1. **Silent sample drop.** `counts[, -3]` removes sample 3 (SRR1039512, an untreated sample) with no stated reason. Its treated partner from the same cell line is left unpaired, and the groups are now unbalanced (3 untreated, 4 treated).
+2. **Cell line ignored.** Every cell line was treated and untreated, so this is a paired design. The model `~ dex` ignores `cell`, while `~ cell + dex` is the usual choice. This throws away the pairing and loses power.
+3. **Wrong organism annotation.** `org.Mm.eg.db` is the mouse database, but the data are human (Ensembl IDs start with `ENSG`). The correct package is `org.Hs.eg.db`. With the wrong one `mapIds` stops with an error ("None of the keys entered are valid keys for 'ENSEMBL'"), which is a useful clue. The wrong fix is to wrap the call in `tryCatch` or let the assistant "make it work" some other way, because that hides the problem and leaves the symbols missing.
+4. **Raw p-values used.** The script filters on `pvalue < 0.05` instead of the adjusted p-value (`padj`), so there is no multiple testing correction.
+5. **Contrast reversed.** `c("dex", "untrt", "trt")` gives log2 fold change of untreated relative to treated, the opposite of "up in treated". A related trap: `dex` is read in as text, so DESeq2 orders the levels alphabetically and `trt` becomes the reference level, which is easy to get backwards. Check with known dexamethasone-responsive genes, which should be up in treated samples. For example, *DUSP1* (ENSG00000120129) and *FKBP5* (ENSG00000096060) would come out negative with this contrast. (Run on the course data, they come out at about -3.1 and -3.9.)
+6. **Hard-coded absolute path.** `/Users/jsmith/Desktop/counts.csv` will break on any other machine, and it points outside the project folder. Use a relative path such as `data/counts.csv`. It is also inconsistent with the relative path used for the sample sheet.
+7. **Unexplained expression filter.** `rowSums > 100` is an arbitrary threshold with no rationale. It also behaves differently depending on how many samples are included.
+8. **No versions or session information recorded**, and nothing in the script records which model made it.
+
+Observations: items 1, 3, 4 and 6 are visible from a line-by-line explanation or from running the script (the `mapIds` error is a giveaway). Item 2 needs you to know the experimental design (the "context is everything" principle). The contrast direction (5) is easy to miss and needs the DESeq2 documentation, or a positive control gene. An adversarial reviewer in a fresh session will usually catch several but may also invent problems, so each item still needs a check.
+```
+

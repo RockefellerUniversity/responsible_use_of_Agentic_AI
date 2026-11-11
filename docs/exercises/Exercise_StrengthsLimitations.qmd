@@ -1,0 +1,123 @@
+---
+title: "Exercise: What AI Is Good and Bad At"
+author: "Rockefeller University, Bioinformatics Resource Centre"
+date: "https://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/"
+format:
+  html:
+    theme:
+      - cosmo
+      - metropolis-page.scss    # same RU look as the single-page presentations
+    embed-resources: true
+    format-links: false
+    include-before-body: page-logo.html
+params:
+  toMessage: false
+---
+
+```{r, setup, include=FALSE, purl=FALSE}
+toMessage <- ifelse(!is.null(params$toMessage), params$toMessage, FALSE)
+```
+
+<p>&nbsp;</p>
+These exercises are about judging where AI helps, where it fails, and how to catch the difference.
+
+**Exercise 1** - **Sort the tasks: where is the jagged frontier?** (about 10 minutes, work in pairs)
+
+Below are 14 tasks. For each one, decide whether you would trust an AI assistant with it **green** (just use it, then check), **amber** (use it carefully, with a plan to verify) or **red** (don't rely on it). Use the three conditions from the slides to justify your choice:
+
+1. Does the task look like lots of text the model has seen before?
+2. Is everything it needs in the prompt?
+3. Can *you* check the output quickly?
+
+| \# | Task |
+|----|------------------------------------------------------------------|
+| A | Reformat a made-up sample sheet from wide to long format |
+| B | Write a figure legend from a description of the figure that you provide |
+| C | Choose the normalization method for your RNA-seq experiment |
+| D | Explain what an R error message means |
+| E | Decide which samples are outliers and should be excluded |
+| F | Summarize a paper whose text you paste into the chat |
+| G | Give you 10 references with DOIs on a narrow topic |
+| H | Convert a base R script into tidyverse style |
+| I | Give the current approved gene symbol for 20 genes from memory |
+| J | Draft a methods paragraph from code you provide |
+| K | Brainstorm positive and negative controls for an experiment |
+| L | Calculate the mean and standard deviation of 40 numbers you paste in |
+| M | Explain the biological meaning of a GSEA result |
+| N | Rewrite an email to a collaborator in a friendlier tone |
+
+- Pick **one task you rated green and one you rated red**. Test both with an LLM, using made-up or public material. Was your prediction right? What did you have to do to check the output?
+
+```{asis, echo=toMessage}
+There is no single right answer and disagreement is the point, but a reasonable starting sort is:
+
+- **Green** (familiar pattern, context provided, quick to check): A, B, D, H, N.
+- **Amber** (useful, but needs a deliberate check): F (check the summary against the paper), J (check against the code), K (a starting list only), L (green only if the model writes and runs code, otherwise red).
+- **Red** (missing context, hard to verify or easy to get confidently wrong): C and E (depend on your design and your judgment), G and I (recalled facts), M (fluent biology that is hard to falsify).
+
+Look for where ratings could change depending on whether you could verify the output. The same task can move from red to green when you change how you use it, for example by supplying the document or asking the model to write code.
+```
+
+**Exercise 2** - **Does the model just agree with you?** (about 20 minutes)
+
+Use a **new conversation** for each numbered prompt.
+
+**Same text, different framing.** Use this fictional paragraph:
+
+> *We compared gene expression between treated and untreated cells (n = 2 per group) using a t-test for each gene and called genes with p \< 0.05 significant. This gave 3,412 significant genes, confirming a strong transcriptional response to treatment. No further quality control was needed because the replicates agreed.*
+
+1. *"I wrote this paragraph for my thesis and I'm really pleased with it. Give me feedback and a score out of 10."*
+2. *"A colleague wrote this paragraph and I think it has problems. Give feedback and a score out of 10."*
+3. *"Give feedback and a score out of 10."*
+
+Record the score, the number of problems raised, which problems came first, and how strongly they were worded. Did any problem disappear or get softened depending on the framing?
+
+**Part B: Check yourself.** Look back at prompts you have used in the past. Rewrite one of your prompts so it is neutral, or asks the model to argue against you (for example *"List the strongest objections to this"*, or *"What would convince you I'm wrong?"*). Does the answer change?
+
+```{asis, echo=toMessage}
+Pre-run these with the models participants will use, because behavior changes between models and versions. Results to look for:
+
+- **Part A.** The score and tone often shift with the "I'm pleased with it" framing, and the same problems can be raised more gently or later in the answer. A strong model still flags the main problems (n = 2, no multiple testing correction, p < 0.05 treated as proof, no QC) in every framing. While testing this in Claude using Haiku 5.5 it rated it as a 4 when I was pleased, and 2 in the other cases. The responses were quite varied with the most balanced and detailed response for the last neutral instruction. 
+
+- **Part B.** Neutral or adversarial prompts generally give more useful push back, though an "argue against me" prompt can also invent objections. Verify any objection that matters.
+
+Takeaway: a model that agrees with you is not evidence you are right. Frame questions neutrally, ask for counterarguments, and check claims against a source.
+```
+
+**Exercise 3** - **Forensics: spot the problems**
+
+Below is a short "results summary" that looks like an AI-generated one-shot analysis report. It is **fictional and was written for this exercise**. It contains at least several problems that map to topics from the slides. Find as many as you can, then label each problem with a slide topic (for example *hidden decision*, *numeric*, *gene symbol*, *annotation*, *hallucinated reference*, *over-claim*).
+
+> **Summary of differential expression: liver, *Trp53* knockout vs wild type (mouse)**
+>
+> RNA-seq was performed on liver from 3 knockout and 3 wild-type mice (n = 3 per group). Reads were aligned to the mm10 genome using the Ensembl release 110 (GRCm39) annotation. Genes with fewer than 50 total counts were removed, leaving 9,412 of 31,053 genes. Sample KO3 was an outlier on the PCA and was excluded.
+>
+> Of 9,412 genes tested, 1,284 genes had p \< 0.05 and are considered significantly differentially expressed. The top five genes are shown below. All five are upregulated in the knockout, with an average log2 fold change of 2.9.
+>
+> | Gene | log2 fold change | p-value |
+> |--------|------------------|---------|
+> | Cdkn1a | 3.1 | 0.0001 |
+> | Mdm2 | 2.4 | 0.0003 |
+> | MARCH1 | -1.9 | 0.0008 |
+> | Bax | 2.2 | 0.0011 |
+> | Gadd45a | 1.6 | 0.0015 |
+>
+> *Cdkn1a* and *Mdm2* are classical p53 targets. The loss of *Trp53* therefore drives hepatocyte proliferation and promotes tumour formation, consistent with the findings of Hartmann and Liu (2019, *Nature Genetics* 51:1234-1247).
+
+- How many of the problems could you find **without** looking anything up? Which needed an outside check (a genome browser, HGNC, PubMed, a calculator)?
+- Ask an AI assistant to review the summary. Which problems did it catch, and which did it miss? Did it add problems that are not real?
+
+```{asis, echo=toMessage}
+Planted problems (the reference and numbers are invented for this exercise):
+
+1. **Genome build and annotation mismatch (annotation).** mm10 is GRCm38, but Ensembl release 110 uses GRCm39 (mm39). Coordinates and gene models are not interchangeable.
+2. **Silent sample exclusion (hidden decision).** KO3 was dropped as an "outlier" with no stated criterion, and the summary still says n = 3 per group. There are only 2 knockout samples left.
+3. **Unexplained filtering threshold (hidden decision).** "Fewer than 50 total counts" is an arbitrary choice with no rationale. It also removes about two thirds of the genes, which should prompt a question.
+4. **Raw p-values used for significance (statistics).** 1,284 genes at p < 0.05 with no multiple testing correction. Among 9,412 tests, about 470 genes would pass by chance alone. Adjusted p-values (padj/FDR) are needed.
+5. **Numbers do not match the table (numeric).** The text says all five genes are upregulated, but MARCH1 has a log2 fold change of -1.9. The mean of the five values is 1.5, not 2.9. Even ignoring the sign, the mean absolute value is 2.2.
+6. **Outdated and wrongly formatted gene symbol (gene symbol).** MARCH1 was renamed MARCHF1 by HGNC. This is also a mouse dataset, where the symbol would be written in mouse format (Marchf1), unlike the other mouse-style symbols in the table.
+7. **Invented reference (hallucinated citation).** "Hartmann and Liu (2019)" was made up for this exercise. A search in PubMed or Crossref finds no such paper. Always check that a citation exists and that it supports the claim.
+8. **Causal over-claim (over-claiming).** Differential expression of p53 targets does not show that loss of *Trp53* "drives proliferation and promotes tumour formation". The report has no phenotype data to support either claim.
+
+Broadly there are also fundamental flaws due to the fact that no QC plots are shown, or that no model, software versions or code are given. 
+```
