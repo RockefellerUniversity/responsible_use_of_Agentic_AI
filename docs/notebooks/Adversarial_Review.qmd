@@ -17,8 +17,6 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Overview
 
-*Presenter: ?? — ?? mins*
-
 - [Why review AI output adversarially?](#why-review-ai-output-adversarially)
 - [Running an adversarial review](#running-an-adversarial-review)
 - [Limits of AI reviewing AI](#limits-of-ai-reviewing-ai)

@@ -1,4 +1,4 @@
-#### **Skills** (?? mins)
+#### **Skills**
 
 Packaging your own instructions and workflows so an AI assistant can reuse them.
 

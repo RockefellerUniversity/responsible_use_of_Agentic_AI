@@ -17,8 +17,6 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Overview
 
-*Presenter: ?? — ?? mins*
-
 - [What is a skill?](#what-is-a-skill)
 - [Using and writing skills](#using-and-writing-skills)
 - [Exercises](#time-for-an-exercise)

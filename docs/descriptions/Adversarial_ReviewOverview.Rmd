@@ -1,4 +1,4 @@
-#### **Adversarial Review** (?? mins)
+#### **Adversarial Review**
 
 Using AI to critique work, and verifying the critique before acting on it.
 

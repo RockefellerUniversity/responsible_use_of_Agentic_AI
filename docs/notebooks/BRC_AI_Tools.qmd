@@ -1,8 +1,8 @@
 ---
-title: "Responsible Use of Agentic AI: BRC and AI Tools"
+title: "Responsible Use of AI for Non-Coders: BRC and AI Tools"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/](http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
 ---
 
@@ -12,55 +12,245 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
 ::: {.content-hidden when-format="revealjs"}
-# Responsible Use of Agentic AI: BRC and AI Tools
+# Responsible Use of AI for Non-Coders: BRC and AI Tools
 :::
 
 ## Overview
 
-*Presenter: ?? — ?? mins*
-
-- [How the BRC uses AI](#how-the-brc-uses-ai)
-- [Tools and resources from the BRC](#tools-and-resources-from-the-brc)
+- [The BRC plugin](#brc-plugin)
+- [BRC code review](#brc-code-review)
 - [Working with the BRC](#working-with-the-brc)
 
-??Suggested slide titles and content are below. Keep, cut or replace them. Everything in this section is a placeholder until you fill it.??
+# The BRC plugin {#brc-plugin background-color="#23373B" .center .middle}
 
-# BRC and AI tools {#how-the-brc-uses-ai background-color="#23373B" .center .middle}
+## The BRC plugin
 
-## How the BRC uses AI
+The *Customizing Your LLM* session showed [what the BRC plugin can do](Customizing.html#/brc-mcp){target="_blank"}. Here is what is inside it and how a session with it runs.
 
-??How the BRC uses AI in its own work: where it helps and where we don't use it. Ties back to the strengths and limitations section, with one or two concrete examples from past projects (e.g. the SCENIC+ example).??
+One install adds two things to Claude Code or Codex:
 
-## What we have learned
+- **A connector (MCP)** to the BRC server: nearly 40 tools for your lab's sequencing data, BRC pipelines and BRC training material.
+- **Four skills** that tell the agent how the BRC does each job, including the mistakes to avoid.
 
-??Lessons from using AI on core facility projects: what went well, what cost more time than it saved, and what we changed as a result.??
+```{.bash code-line-numbers="false"}
+/plugin marketplace add RockefellerUniversity/brc-mcp-plugin
+/plugin install brc-bioinformatics@rockefeller-brc
+```
 
-# Tools and resources from the BRC {#tools-and-resources-from-the-brc background-color="#23373B" .center .middle}
+The first time a tool is used, a browser window opens for you to sign in with your BRC account.
 
-## BRC tools available through RU Claude
+::::: {.content-visible when-format="revealjs"}
+::: notes
+The plugin repository is private for now: the BRC gives access with an account.
+Installing the plugin does not give access to data. Every request is checked against the user's lab.
+The same plugin works in Claude Code and Codex.
+:::
+:::::
 
-Rockefeller intends to make RU-developed methods, for example BRC's tools, available via RU Claude (see *AI Strategy at Rockefeller*).
+## The four skills {.smaller}
 
-??List the BRC tools and resources that will be available this way, how to access them and their current status (available now / planned).??
+Each skill loads when your question matches its description, as in the *Customizing* session.
 
-## Course and teaching materials
+| Skill | What it does | Say something like |
+|---|---|---|
+| **brc-rnaseq** | Bulk RNA-seq: QC, differential expression, IGV views, expression across your lab's samples | "Compare EpSC vs SB and show me the top genes" |
+| **brc-scrna** | Single-cell: load a dataset, clusters, UMAP, violin and dot plots, marker genes | "Plot KRT14 on the UMAP of the skin dataset" |
+| **brc-pipeline** | Your lab's users, sequencing runs and pipeline jobs; QC across assays; start new pipeline runs | "Which of our libraries from last month failed QC?" |
+| **brc-docs** | Searches BRC training courses and links to the slide it used | "How does the BRC normalise RNA-seq counts?" |
 
-??Link to BRC training materials and how they can be used with AI tools (e.g. as context to supply in a prompt).??
+The skills hold what the BRC has learned from running these analyses. For example, a sample name can recur across runs, so the skill pins a sample to its run before using it.
 
-## Skills, templates and shared configuration
+## The tools behind it {.smaller}
 
-??Examples of packaged instructions, project templates or configuration files the BRC provides so that everyone starts from the same good defaults. Links to the *Customizing Your LLM* and *AI in Your Workflow* sections.??
+The agent can only use these tools. It cannot browse the server.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Your lab**
+
+- Who you are and which labs you can see
+- Lab members, sequencing runs, FASTQ files, pipeline jobs
+- Find samples and their QC
+
+**Bulk RNA-seq**
+
+- Preview, then run, a differential expression report on the HPC
+- Read DE results; pull expression for any gene across lab samples
+- IGV sessions, alone or linked to DE results
+:::
+
+::: {.column width="50%"}
+**Single-cell**
+
+- List and load datasets, cell types and metadata
+- UMAP, violin and dot plots; marker genes
+- Read-only SQL over the cell table
+
+**Pipelines**
+
+- Preview, then submit, a BRC pipeline run (RNA-seq, ATAC-seq, CUT&RUN, CLIP-seq)
+
+**Training**
+
+- Search BRC course material and cite it
+:::
+
+::::
+
+## A session with the plugin {.smaller}
+
+| You ask | The agent | You |
+|---|---|---|
+| "Which RNA-seq samples from our last run look bad?" | Pulls QC for every library and flags the outliers | Decide which to drop |
+| "Compare EpSC vs SB, without those two" | **Previews** the comparison: samples, groups, design | **Check it and say go** |
+| "Go" | Runs DESeq2 on the BRC HPC | Wait for it to finish |
+| "Top 20 genes up in SB. Any keratins?" | Reads the DE results; uses only values the tool returned | Judge the biology |
+| "Show the top 5 in IGV" | Builds an IGV session linked to the DE table | Look at the tracks |
+| "Write this up" | Writes a report of the steps, numbers and plots | Read it before you share it |
+
+The steps that use compute (a DE run or a pipeline submission) always **stop for your OK**.
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+This is the arc behind the bulk RNA-seq example report in the Customizing session.
+Good point to stress: the preview step is where most mistakes are caught (wrong samples, groups the wrong way round).
+:::
+:::::
+
+## Getting access
+
+- **You need a BRC account.** Your access follows your lab, so you see only your lab's data.
+- **It works in Claude Code and Codex.** You also need Node.js, which the connector uses.
+- **Start with questions that only read data**, such as QC, existing results or plots. Move on to runs once you trust what you see.
+- **Bring the results to us.** Statistical and biological judgement is for you and BRC staff, not the agent.
+
+Ask for access at **[brc@rockefeller.edu](mailto:brc@rockefeller.edu)**.
+
+# BRC code review {#brc-code-review background-color="#23373B" .center .middle}
+
+## Why review AI-written code?
+
+The worst errors in analysis code are **silent**. The code runs and the result looks plausible, but it is wrong:
+
+- a contrast the wrong way round
+- `voom` run on data that is already logged
+- raw p-values labelled as adjusted
+- a join that turns missing values into zeros
+
+An AI agent writes code like this as confidently as correct code. A clean run is not a correct result.
+
+## biocritic
+
+A BRC tool that looks for silent errors in R and Python analysis code.
+
+```{mermaid}
+flowchart LR
+  R[("Your code<br/>and data")] --> C["<b>Checks</b><br/>13 rules, no AI<br/>e.g. Excel-mangled<br/>gene names"]
+  R --> M["<b>Two AI reviewers</b><br/>different model families<br/>read every file"]
+  M --> D["<b>Documentation check</b><br/>each claim checked against<br/>the package's own docs"]
+  C --> P["<b>Report</b><br/>file, lines, why it<br/>matters, the fix"]
+  D --> P
+```
+
+- **The models run on a BRC GPU.** Your code is never sent to an outside service.
+- **Two models from different families** have different blind spots. Findings both raise go to the top.
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+Models: qwen3.8-27B and gemma-4-31B, open-weight, served on one L40S GPU on the Rockefeller HPC.
+The checks without AI also catch DESeq2 alpha differing from the padj cut-off, the wrong species' mitochondrial prefix, genome build mismatches and filters that remove nothing.
+The report also lists checks that could not run, so "no findings" isn't mistaken for "checked and clean".
+:::
+:::::
+
+## What it finds {.smaller}
+
+A lab's unpublished R analysis (3,939 lines) had four known errors from a manual review:
+
+| Error | Found by AI? |
+|---|---|
+| A residual computed as `y - slope*x + intercept` instead of `y - (slope*x + intercept)` | Yes, by both models |
+| Genes missing at 30 min set to a score of 0 after a join | No (one model saw it, called it a design choice) |
+| `voom` applied to log-scale scores, not counts | Yes, by one model |
+| A volcano plot labelled "-log10(p-adj)" that shows raw p-values | No |
+
+It also flagged a choice worth questioning: negative scores set to 0 before the test.
+
+**Two of four found.** The ones it found would have changed the results, so it was worth running. It still didn't replace the manual review.
+
+## How good is it?
+
+| Test | Result |
+|---|---|
+| 92 test repositories with 83 planted errors | Catches **75%**; about **7 in 10** findings are real errors |
+| Code from 10 published papers | Found **3 real errors that change results**; most other findings were minor or false |
+
+- **It is a screening tool, not a proof.** It misses errors, and some of what it reports is wrong.
+- **Read every finding.** Treat it like a colleague's comment: usually useful, sometimes wrong.
+- **A clean report doesn't mean correct code.**
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+Benchmark: planted errors scored automatically against known answers. Without the data checks, recall is 65%.
+Published code: findings were graded blind. The 3 real errors were ones that change published results.
+:::
+:::::
+
+## Rebuild the environment
+
+The BRC code-reviewer also writes the **recipe to reproduce your code's software environment**.
+
+- It reads the packages your code uses.
+- It writes a **Dockerfile**, an **Apptainer** recipe and a **conda** environment for them.
+- It lists the packages you use but **never pinned to a version**, a common reason analyses can't be re-run.
+
+A result is only reproducible if someone else can rebuild the software it ran on.
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+This comes from the BRC code-reviewer container (local models, seven review dimensions: accuracy, logic, reproducibility, statistics, data leakage, secrets, documentation).
+The recipes are written to reports/environment/ next to the review.
+:::
+:::::
+
+## A review vault that remembers {.smaller}
+
+With a **review vault** (a folder of Markdown notes, made to open in [Obsidian](https://obsidian.md){target="_blank"}), reviews build up over time:
+
+- **One note per finding**, tracked across runs: *open*, *fixed* or *regressed*. Each report starts with "Since last run: 3 new · 2 fixed · 1 regressed".
+- **You teach it.** Mark a finding *dismissed* and write why. It isn't reported again, and your reason becomes lab knowledge.
+- **Your lab's rules.** Put conventions in `conventions/` (for example "set a seed at the top of every script") and every review checks them.
+- **Methods vs code.** Add your methods section as `methods.md` and it checks that the code does what the paper says.
+
+A shared vault (for example a private GitHub repository) lets the whole lab see the same findings and decisions.
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+Same idea as CLAUDE.md and MEMORY.md in the Query and Context session: write things down once in Markdown and every later session uses them.
+Dismissed findings are counted in the report header, so nothing disappears silently.
+:::
+:::::
+
+## Using BRC code review
+
+The code review tools are **internal to the BRC** for now.
+
+- **Send us your code**, or a GitHub repository, before you publish or share an analysis. We run the review and go through the findings with you.
+- **Include the data**, or its first lines. Some errors, such as Excel-mangled gene names, only show up in the data.
+- **Include your methods section** if you have one.
+
+Ask at **[brc@rockefeller.edu](mailto:brc@rockefeller.edu)**.
 
 # Working with the BRC {#working-with-the-brc background-color="#23373B" .center .middle}
 
-## When to talk to us
-
-??When to contact the BRC: reviewing an AI-assisted analysis, choosing a method, setting up a reproducible workflow, a new tool you want to try.??
-
-## Feedback and community contributions
-
-??How to send feedback, request tools and contribute (the AI Strategy section says community contributions are welcome).??
-
 ## Contact
 
-??Contact details and where to find BRC resources.??
+Talk to us when you want to:
+
+- get access to the **BRC plugin**
+- have an AI-assisted analysis **reviewed**
+- choose a method or set up a **reproducible workflow**
+- try a new AI tool safely with your data
+
+**[brc@rockefeller.edu](mailto:brc@rockefeller.edu)** · [BRC training courses](https://rockefelleruniversity.github.io/){target="_blank"}

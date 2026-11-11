@@ -1,4 +1,4 @@
-#### **Connectors and Plugins** (?? mins)
+#### **Connectors and Plugins**
 
 Connecting an AI assistant to other services and data, and extending it with plugins.
 

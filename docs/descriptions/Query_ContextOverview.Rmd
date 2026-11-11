@@ -1,4 +1,4 @@
-#### **What Happens With a Query** (45 mins, Tom)
+#### **What Happens With a Query**
 
 What the model actually "sees" when you send a message.
 

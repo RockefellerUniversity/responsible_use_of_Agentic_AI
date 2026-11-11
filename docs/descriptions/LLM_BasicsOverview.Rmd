@@ -1,9 +1,8 @@
-#### **Basics of LLMs** (45 mins, Claire)
+#### **Basics of LLMs**
 
 What large language models (LLMs) are, how they are built, and how the tools you use fit together.
 
 * How models are built and what they are trained to do — next-token prediction
-* Current events: who builds and runs these models
-* Journal policies on AI use — you are the final backstop
+* Who builds and runs these models, and access restrictions
+* Funder and journal policies on AI use — you are the final backstop
 * Terminology: model vs. app (ChatGPT/Claude) vs. agent
-* Exploring the interface: chat vs. code, effort, model selection

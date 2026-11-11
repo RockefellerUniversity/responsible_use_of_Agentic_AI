@@ -1,8 +1,8 @@
 ---
-title: "Responsible Use of Agentic AI: AI Strategy at Rockefeller"
+title: "Responsible Use of AI for Non-Coders: AI Strategy at Rockefeller"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/](http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
 ---
 
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
 ::: {.content-hidden when-format="revealjs"}
-# Responsible Use of Agentic AI: AI Strategy at Rockefeller
+# Responsible Use of AI for Non-Coders: AI Strategy at Rockefeller
 :::
 
 ## Overview
@@ -26,11 +26,11 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Claude for EDU
 
-Rockefeller has licensed Claude under the **"Claude for EDU"** program.
+Rockefeller has licensed Claude under the [**"Claude for EDU"** program](https://www.anthropic.com/news/introducing-claude-for-education).
 
 - **Data:** Sharing data with Anthropic is prevented according to our agreement
 - **Limits:** Usage limits/tokens should be more favorable than the standard Claude Pro/Max plans
-- **Life sciences:** Rockefeller has applied to the **"Life Sciences Verification Program"**. If accepted, Rockefeller Claude users should experience reduced blocking for biological research questions
+- **Life sciences:** Rockefeller has applied to the [**"Life Sciences Verification Program"**](https://www.anthropic.com/news/life-sciences-verification-program). If accepted, Rockefeller Claude users should experience reduced blocking for biological research questions.
 
 
 ## Integrating Claude
@@ -46,7 +46,7 @@ Rockefeller is working to bring its own resources into Claude:
 
 ## RU AI Sandbox
 
-RU has developed a private interface to select LLMs called the **"RU AI Sandbox"**.
+RU has developed a private interface to select LLMs called the [**"RU AI Sandbox"**](https://it.rockefeller.edu/ruai)[VPN Required].
 
 - Privacy is not just enforced via an agreement as the LLMs are **technically isolated**.
 - A chatbot/agent is available on this platform called the **"Forms and Policies Agent"**.
@@ -56,7 +56,7 @@ RU has developed a private interface to select LLMs called the **"RU AI Sandbox"
 
 ## AI Policy
 
-The governing policy on AI use at Rockefeller is the **"Responsible Use of AI Policy"**.
+The governing policy on AI use at Rockefeller is the [**"Responsible Use of AI Policy"**](https://formspolicies.rockefeller.edu/getfile.php?type=Policy&file=IT_Responsible_AI_Use_Policy_Final_docx)[VPN required].
 
 This includes the **"approved AI list"**
 

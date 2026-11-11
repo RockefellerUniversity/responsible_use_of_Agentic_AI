@@ -1,8 +1,8 @@
-#### **AI Strategy at Rockefeller** (15 mins, Anthony)
+#### **AI Strategy at Rockefeller**
 
 What AI tools and support Rockefeller provides, and what data you are and are not allowed to put into them.
 
 * Claude at Rockefeller (Claude for EDU) and how it will be integrated
 * The RU AI Sandbox
 * The Responsible Use of AI Policy, the approved AI list and protected data
-* Agentic identities and the Data Science Platform
+

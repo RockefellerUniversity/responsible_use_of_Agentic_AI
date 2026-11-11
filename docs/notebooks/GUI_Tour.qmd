@@ -1,8 +1,8 @@
 ---
-title: "Responsible Use of Agentic AI: Interface Tour"
+title: "Responsible Use of AI for Non-Coders: Interface Tour"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/](http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
 ---
 
@@ -12,245 +12,147 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
 ::: {.content-hidden when-format="revealjs"}
-# Responsible Use of Agentic AI: Interface Tour
+# Responsible Use of AI for Non-Coders: Interface Tour
 :::
 
 ## Overview
 
-*Presenter: ?? — 10 mins*
+A quick tour of two graphical apps side by side, **Codex** (left) and **Claude Code** (right). The features are largely the same in both. Knowing where they live is what matters. It's also okay to use the CLI if you prefer. 
 
-A quick tour of two graphical apps side by side, **Codex** (left) and **Claude Code** (right). The features are largely the same in both. Knowing where they live is what matters.
-
+- [Layout Overview](#layout)
 - [Chat vs code](#chat-vs-code)
 - [Projects](#projects)
 - [Models and effort](#models)
-- [Usage](#usage-and-limits)
-- [Permissions and context](#permissions)
-- [Seeing what it did](#seeing-what-it-did)
-
-??Timing guide: ~1 min per slide. Slides marked (optional) can be dropped if running over.??
 
 # Interface tour {background-color="#23373B" .center .middle}
 
-## The layout at a glance
+## The layout at a glance {#layout}
+
+There are several key parts of the GUI. 
+
+1. Prompt box: Where you type instructions.
+2. Conversation Area: Where the model replies and informs you what it is doing.
+3. Project Organization: Sidebar with your projects and past sessions.
+4. Model picker: which model answers, and how hard it thinks.
+
+## The layout at a glance - Codex
 
 :::: {.columns}
 
 ::: {.column width="50%"}
-**Codex**
 
-??Screenshot: the full Codex window with callouts (numbered 1-5) on: conversation area, prompt box, sidebar (projects/sessions), settings, and where the model is chosen.??
+![](../imgs/chatgpt1.png){fig-align="center" width="70%"}
+
 :::
 
 ::: {.column width="50%"}
-**Claude Code**
 
-??Screenshot: the full Claude desktop app on the Code tab with the same five callouts, using the same numbering so the audience can compare.??
+1. Prompt Box
+2. Conversation Area
+3. Project Organization
+4. Model Picker
+
 :::
 
 ::::
 
-Talking point: the same parts exist in both. Learn the layout once.
+
+## The layout at a glance - Claude
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](../imgs/claude1.png){fig-align="center" width="70%"}
+:::
+
+::: {.column width="50%"}
+
+1. Prompt Box
+2. Conversation Area
+3. Project Organization
+4. Model Picker
+
+:::
+
+::::
 
 ## Chat vs code {#chat-vs-code}
 
-:::: {.columns}
-
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: how Codex separates a plain conversation from a coding/agent task (confirm where this lives in the Codex UI).??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: the Chat tab and the Code tab of the Claude desktop app, side by side or tab-switch cropped.??
-:::
-
-::::
+Built-in to both GUIs are the more traditional chat-bot and the agentic-powered projects. 
 
 - **Chat:** you ask, it answers. It cannot touch your files.
 - **Code / agent:** it reads your files, runs commands and writes files on your computer.
-- This is the main difference between asking a question and delegating a task, and it's where the risk changes. (Links to *Terminology: model / app / agent* in the Basics section.)
+
+The main difference is between asking a question and delegating a task, and it's where both the risk and possibilities lie.
+
+
+## Chat vs code {#chat-vs-code2}
+:::: {.columns}
+
+::: {.column width="50%"}
+**Codex**
+
+![](../imgs/chatgpt2.png){fig-align="center" width="70%"}
+:::
+
+::: {.column width="50%"}
+**Claude Code**
+
+![](../imgs/claude2.png){fig-align="center" width="70%"}
+:::
+
+::::
 
 ## Projects {#projects}
 
-:::: {.columns}
+- The agent works inside the **folder you give it**. Choose it deliberately as th first step in providing the scope of files the agents can access.
+- Each project has its own sessions (conversations) and, optionally, its own config files.
+- **Never** point it at a folder holding raw data or anything you wouldn't want changed.
 
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: choosing / adding a project folder in Codex, and the list of past sessions for it.??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: choosing a working folder in the Claude Code tab, and the session list in the sidebar.??
-:::
-
-::::
-
-- The agent works inside the **folder you give it**. Choose it deliberately.
-- Each project has its own sessions (conversations) and, optionally, its own instruction file. (Instruction files are covered in the workflow section.)
-- Never point it at a folder holding raw data or anything you wouldn't want changed.
-
-## Models {#models}
+## Projects 
 
 :::: {.columns}
 
 ::: {.column width="50%"}
 **Codex**
 
-??Screenshot: the model picker open in Codex, showing the available models.??
+![](../imgs/chatgpt3.png){fig-align="center" width="70%"}
 :::
 
 ::: {.column width="50%"}
 **Claude Code**
 
-??Screenshot: the model picker open in Claude Code (Opus / Sonnet / Haiku), ideally with the model name visible near the prompt box.??
+![](../imgs/claude3.png){fig-align="center" width="70%"}
 :::
 
 ::::
 
-- Bigger models are slower, cost more usage, and are usually better at hard, multi-step problems. Smaller models are fast and fine for simple tasks.
-- Note which model you used: it's part of reproducibility (see the workflow section).
+## Models and Effort {#models}
 
-## Effort and thinking
+There are two dials for controlling the capabilities of the model for a task.
+
+More advanced models and higher effort:
+
+- Better for hard problems
+- Slower
+- More expensive/use more tokens
+
+## Models and Effort
 
 :::: {.columns}
 
 ::: {.column width="50%"}
 **Codex**
 
-??Screenshot: the effort / reasoning setting in Codex (confirm where it is exposed in the UI).??
+![](../imgs/chatgpt4.png){fig-align="center" width="70%"}
 :::
 
 ::: {.column width="50%"}
 **Claude Code**
 
-??Screenshot: the effort setting in Claude Code, and an example of the thinking display if shown.??
+![](../imgs/claude4.png){fig-align="center" width="70%"}
 :::
 
 ::::
 
-- Higher effort means the model thinks longer before answering. This usually means better answers on hard problems, but slower responses and more usage.
-- Start low for simple questions, raise it for complex analysis steps.
-
-## Usage and limits {#usage-and-limits}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: where Codex shows usage / remaining limit.??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: the usage view in Claude (plan limits, how much is left in the current window).??
-:::
-
-::::
-
-- Plans have limits that reset over time. Large models, high effort and long sessions use them up faster.
-- Rockefeller's Claude for EDU usage limits should be more favorable than the standard plans (see the *AI Strategy at Rockefeller* section).
-
-## Permissions {#permissions}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: an approval prompt in Codex (e.g. asking permission to run a command), and where the approval / sandbox mode is set.??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: a permission prompt in Claude Code, and the permission-mode selector.??
-:::
-
-::::
-
-- The agent asks before doing certain things. The prompt is a decision point: read it before approving.
-- Where you set this decides how much the agent can do without asking. (Covered in depth in the *hard lines* part of the workflow section.)
-
-## Giving it context
-
-:::: {.columns}
-
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: attaching a file or referencing a file in the prompt box in Codex.??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: attaching a file / @-mentioning a file in the Claude Code prompt box.??
-:::
-
-::::
-
-- The model only knows what is in the conversation. Attach or reference the files it needs. (Links to *What Happens With a Query*.)
-- Anything you attach is sent to the model. Check the data policy first.
-
-## Seeing what it did {#seeing-what-it-did}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: the view of file changes (a diff) and the commands it ran in Codex.??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: the task list, diff view and terminal output in Claude Code after a short task.??
-:::
-
-::::
-
-- Review the changes and the commands, not just the final answer.
-- This is how you keep the code and the record of what ran (see *Reproducibility* in the workflow section).
-
-## Settings that matter for your data (optional)
-
-:::: {.columns}
-
-::: {.column width="50%"}
-**Codex**
-
-??Screenshot: the settings page covering data sharing / privacy and memory (confirm what Codex exposes).??
-:::
-
-::: {.column width="50%"}
-**Claude Code**
-
-??Screenshot: the privacy / memory / connectors settings in the Claude app.??
-:::
-
-::::
-
-- Check what is switched on: memory, connectors and integrations, data-sharing settings.
-- Defaults differ between personal and institutional accounts. See the *AI Strategy at Rockefeller* section.
-
-## Other features worth a mention (optional)
-
-??Pick any that fit the time: connectors, skills, scheduled tasks, session history/search, running a task in the background, switching between apps.??
-
-## Summary
-
-- The two apps do the same jobs with different layouts.
-- Choose the **mode** (chat vs code), the **folder**, the **model** and the **effort** deliberately.
-- Read **permission prompts** and **review what was done**.
-
-??Optional: a live demo of one short task in each app instead of this slide??

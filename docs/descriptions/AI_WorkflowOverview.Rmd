@@ -1,9 +1,9 @@
-#### **AI in Your Workflow** (50 mins, Matt)
+#### **AI in Your Workflow**
 
 How to work with AI safely and effectively, even if you can't read the code it writes.
 
-* What a good workflow looks like
-* Software environments and resource use
-* Good practice still applies: clear instructions, working on subsets, checking results
-* Hard lines: CLAUDE.md and other configuration files
-* Controlling what the AI is allowed to do
+* Should I use AI for this task? Stakes and verifiability
+* A good workflow: planning, reproducibility, checkpoints and review
+* Checking work you can't read, and the step-by-step analysis loop
+* Software environments, resources and reports
+* Bad practice, hard lines and controlling what the AI is allowed to do

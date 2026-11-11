@@ -17,8 +17,6 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Overview
 
-*Presenter: ?? — ?? mins*
-
 - [Connectors and MCP](#connectors-and-mcp)
 - [Plugins](#plugins)
 - [Security and data considerations](#security-and-data-considerations)

@@ -1,8 +1,8 @@
 ---
-title: "Responsible Use of Agentic AI: AI in Your Workflow"
+title: "Responsible Use of AI for Non-Coders: AI in Your Workflow"
 subtitle: " <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University"
 author:
-  - "[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)"
+  - "[http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/](http://rockefelleruniversity.github.io/responsible_use_of_AI_for_noncoders/)"
   - "[brc@rockefeller.edu](mailto:brc@rockefeller.edu)"
 ---
 
@@ -12,20 +12,48 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
 ::: {.content-hidden when-format="revealjs"}
-# Responsible Use of Agentic AI: AI in Your Workflow
+# Responsible Use of AI for Non-Coders: AI in Your Workflow
 :::
 
 ## Overview
 
-- [What is a good workflow](#what-is-a-good-workflow)
-- [Hard lines](#hard-lines)
+- [Should I use AI for this task?](#should-i-use-ai-for-this-task)
+- [What is a good AI workflow](#what-is-a-good-ai-workflow)
+- [Planning](#planning)
+- [Reproducibility](#reproducibility)
+- [Checkpoints and review](#checkpoints-and-review)
+- [Other things to consider](#other-things-to-consider)
+- [The analysis loop](#the-analysis-loop-one-step-at-a-time)
+- [Bad practice](#bad-practice)
 - [Controlling what is allowed](#controlling-what-is-allowed)
+- [Hard lines](#hard-lines)
+- [Exercise](#time-for-an-exercise)
+
+## Should I use AI for this task?
+
+Two questions decide how much to trust AI with a task:
+
+1.  **Stakes** - how costly is it if the output is wrong and nobody notices?
+2.  **Verifiability** - how quickly and reliably can *you* check the output?
+
+## Stakes and verifiability
+
+|  | **Easy to verify** | **Hard to verify** |
+|------------------------|------------------------|------------------------|
+| **Low stakes** | **Just use it.** Reformat a sample sheet, draft a figure legend, explain an error message. | **Use it loosely.** Brainstorming or drafting a document. Treat it as a starting point only. |
+| **High stakes** | **Use it, then check it.** Have it write code to count rows, then compare with a spreadsheet filter. Check gene IDs against Ensembl. | **Don't rely on it alone.** Choosing the statistical test, deciding which samples to exclude, interpreting the biology. Read up or talk to a bioinformatician. |
 
 # Good workflows {background-color="#23373B" .center .middle}
 
 ## What is a good AI workflow
 
-A good AI workflow for bioinformatics largely replicates a good bioinformatics workflow. As with how we code more traditionally, taking short-cuts comes back to haunt us later. Very little of Bioinformatics is just 'plug and play'.
+A core principle of working with the LLM is being the driver. It is easy to be a passenger. Especially if there's time pressure or it seems to be agreeing with you. The more you yield decision-making and executive control to these tools, the more chance that mistakes happen. 
+
+If at any point you feel out of your depth or if the analysis starts to feel like a black box, that is when you need to reach out for support from your friendly neighborhood bioinformatician. 
+
+## What is a good AI workflow
+
+A good AI workflow for bioinformatics largely replicates a good bioinformatics workflow without AI. As with how we code more traditionally, taking short-cuts comes back to haunt us later. Very little of Bioinformatics is just 'plug and play'.
 
 Key cornerstones:
 
@@ -33,11 +61,7 @@ Key cornerstones:
 - Reproducibility
 - Checkpoints and Review
 
-## What is a good AI workflow
 
-A core principle of working with the LLM is being the driver. It is easy to be a passenger. The more you yield decision-making and executive control to these tools, the more chance that mistakes happen. 
-
-If at any point you feel out of your depth or if the analysis starts to feel like a black box, that is when you need to reach out for support from your friendly neighborhood bioinformatician. 
 
 ## Getting Started
 
@@ -45,17 +69,15 @@ Open up Claude Code or OpenAI Codex and start a new project.
 
 The folder you provide will define the scope. This means where on your computer it will have access to. You will also want to add any files there you want it to be able to read. 
 
-?Add screenshot exmaple?
-
 # Planning {background-color="#23373B" .center .middle}
 
 ## Planning
 
-To start with we need do make decisions about how we will address our problem.
+To start with we need to make decisions about how we will address our problem.
 
-For example:
+**For example:**
 
-"I have some scRNAseq data from mouse fat cells. I want to do some generate clusters of fat cell sub types"
+*"I have some scRNAseq data from mouse fat cells. I want to generate clusters of fat cell sub types"*
 
 At this point you can decide what software to use (Seurat/Scanpy) and what reference to use (mm10/mm39). 
 
@@ -63,11 +85,13 @@ Having a plan is important from the outset. If you are unfamiliar with the analy
 
 ## Planning
 
-Working collaboratively with the LLMs to make an analysis plan document is a good place to start. This will help break down your broad objectives into smaller tasks. This will also provide a backbone which will handover between analysis sessions.
+Working collaboratively with the LLMs to make an analysis plan document is a good place to start. This will help break down your broad objectives into smaller tasks.
 
-"I have some scRNAseq data from mouse fat cells. I want to do some generate clusters of fat cell sub types. I want help building an analysis workflow. First though we will work together to make key decisions like software and which analysis steps are required. In the process I want to make an analysis plan document broken down into the key steps for the workflow"
+**For example:**
 
-?link to example plan?
+*"I have some scRNAseq data from mouse fat cells. I want to do some generate clusters of fat cell sub types. I want help building an analysis workflow. First though we will work together to make key decisions like software and which analysis steps are required. In the process I want to make an analysis plan document broken down into the key steps for the workflow"*
+
+There are several skills which can also help with this process like /grill and /plan. 
 
 ## Planning
 
@@ -76,22 +100,27 @@ You can use LLMs to help with planning, but as always, do not take it purely at 
 It is ultimately up to you to decide what is the best approach.
 
 i.e. scRNAseq has a pretty standard QC workflow, but there are many edge cases:
-- Cell cycle regression can have negative consequences for Neurons
+
+- Cell cycle regression can remove real signal in post-mitotic Neurons
 - Standard filters will vary between snRNA and scRNAseq
 - Relaxed filtering may be necessary to detect rare cell types
+
+## Planning
+
+There is an example plan built [here](https://github.com/RockefellerUniversity/responsible_use_of_AI_for_noncoders/blob/master/docs/data/airway_analysis_plan.md) with the help of Claude Opus 5.5 for some differential analysis of some RNAseq data.
+
+There is no defined standard to make a document like this, but you can see here what kind of information  is good to include to help provide consistent context, track progress and to ensure good rigor. 
+
 
 # Reproducibility {background-color="#23373B" .center .middle}
 
 ## Reproducibility
 
-LLMs in general are not reproducible. If I ask the same prompt multiple times I will get different response as the context evolves. 
+LLMs in general are not reproducible. If I ask the same prompt multiple times I will get different responses. 
 
-Even if someone trying to replicate my work was able to match the context identically they would also need to use the identical model. Frontier models like those from Claude and ChatGPT though are dynamic, update, and are then retired with limited to access them. 
+Say I had perfectly copied my context so that someone could replicate my work they could still struggle to use the identical model. Frontier models like those from Claude and ChatGPT, do update and are then retired with limited to access them. 
 
-If this is the state of play how do you stay reproducible?
-
-
-? try to show example of same prompts twice?
+**If this is the state of play how do you stay reproducible?**
 
 ## Reproducibility
 
@@ -104,56 +133,55 @@ The LLMs should not be covertly running code and making plots without it also sa
 
 ## Managing software
 
-It doesn't matter if you are running code in R, python, shell scripts etc. What matters is that you have static versions of these software and the packages they use across your analysis. This means once you start on a project you do not update the software. 
+It doesn't matter if you are running code in R, python, shell scripts etc. What matters is that you have static versions of these software and the packages they use across your analysis. This means once you start on a project you **do not** update the software. 
 
-You can use package managers like Conda/Mamba or create containers like Dockers to help manage your software and also enable you to share these with other people or other systems i.e. HPC. 
+You can use package managers like *Conda/Mamba* or create containers like *Dockers* to help manage your software and also enable you to share these with other people or other systems i.e. HPC. We have a whole course on reproducibility including software management [here](https://rockefelleruniversity.github.io/RU_reproducibleR/)
 
 You do not need to do this alone though. Setting up these software environments is something that Claude and ChatGPT are pretty good at. Once you are set up you can ensure it takes an appropriate snapshot, then you are good to go. 
-
-?Show diagram of how these fit together?
-? Show an example prompt?
 
 ## Always make code
 
 Once you have your software the next step is code. You can easily prompt code generation by simply asking for it.
 
-Especially when working on my laptop I will have a folder in which I will have data, results and the code which links the two. 
+When working on a project I will have a folder in which I will have data, results and the code which links the two. 
 
-If we are using an Claude Code or Codex, these files will be generated in your project. 
+If we are using Claude Code or Codex, these files will be generated in your project. 
 
-Ideally you would be using Git and Github as you go to mange version control. Again Claude can help with this. 
+Ideally you would be using Git and Github as you go to manage version control. Again Claude can help with this (though you should give it limited permissions). 
 
 # Checkpoints and Review {background-color="#23373B" .center .middle}
 
 ## Checkpoints
 
 As we mentioned with strengths and limitation we don't necessarily want to do everything at once for two main reasons:
-  * Its easier for the LLMs to get overwhelmed by the scale of the task.
-  * Its easier for the user to skip essential checkpoints and tests. 
 
-? example prompt?
+  * It's easier for the LLMs to get overwhelmed by the scale of the task.
+  * It's easier for the user to skip essential checkpoints and tests. 
 
 ## Checkpoints
 
-If you are trying something for the first time or working on something exploratory this is even more important. The key part is to do this piece-by-piece and review the outcomes. You should hopefully have technical and biological expectations about the data as it is processed
+If you are trying something for the first time or working on something exploratory checkpoints are even more important. The key is to evaluate code line-by-line and review the outcomes. You should hopefully have technical and biological expectations about the data as it is processed.
 
 For example:
-  * What distribution should the data have?
+
+  * How many rows should the matrix have?
   * Should it be logged?
+  * What distribution should the data have?
   * Should a marker gene be expressed in one sample and not the other?
 
 ## What should I do if I can't read the code
 
 If you do not understand the code that you are generating take some extra time and break it down. Just because it runs, does not mean it is doing what you want it to do. 
-These steps are based on key principles in Bioinformatics that we use when we run new tools or languages we are unfamiliar with. 
 
-* **Ask for annotation of the code** - Once annotated read the overviews and ask questions (not just to the LLMs). Add your own additional annotations to help fill in the gaps.
+Here are some suggested steps based on key principles in coding and Bioinformatics that we use when we run new tools or languages we are unfamiliar with. 
+
+* **Ask for annotation of the code** - Once annotated read the overviews and ask questions (not just to the LLMs). Add your own additional annotations to help fill in the gaps or correct mistakes.
 
 * **Run it** - If code is wrong, it often errors or gives warnings. If it runs, check the output is right. If you don't know what right looks like then you need some positive controls and trial datasets. If it gives warnings, double-check why. 
 
-* **Look it up** - Check arguments against the package help and vignettes. Check anytime it points you to a paper. Review the core principles of your analysis
-
 ## What should I do if I can't read the code 
+
+* **Look it up** - Check arguments against the package help and vignettes. Check anytime it points you to a paper. Review the core principles of your analysis
 
 * **Start small** - Only use a small amount of the data. You do not need to run all the data at once. Make sure you understand it first so you know it is doing what is is supposed to be doing. 
 
@@ -161,26 +189,46 @@ These steps are based on key principles in Bioinformatics that we use when we ru
 
 * **Verify the numbers** - Does it make sense? Export results to spreadsheets so you can manually review. Do directions of changes make sense? Does the normalization make sense? Compare to plots and visualizations.
 
-- **Cross-check** - Ask in a fresh session, or a different model, and compare. Disagreement means look carefully. You can also ask it to perform an This is *Adversarial Review* of the code that has been generated. 
+## What should I do if I can't read the code 
 
-You remain responsible for everything the tool produces (see *Journal policies* in the LLM Basics section).
+- **Cross-check** - Ask in a fresh session, or a different model, or different LLM provider, and compare. Disagreement means look carefully.
 
-# Other things to consider {background-color="#23373B" .center .middle}
+::: {.callout-warning title="Remember"}
+You remain responsible for everything the LLMs produce.
+:::
 
-## Mananging resources
 
-When you are building scripts and planning something that is a little more computationally intensive you should also consider the resources you have available to you. Either on your laptop or on remote servers i.e. HPC systems. 
+## The analysis loop: one step at a time
 
-Already we suggest running your analysis on a subset to start, so you can make sure the code itself runs ok.
+```{mermaid}
+flowchart LR
+  P["1 Plan<br/>plan.md"] --> E["2 Pin environment<br/>environment.yml / renv.lock"]
+  E --> M
 
-Once you have functioning code and are ready to run everything, then you should provide information about your computational setup so LLMs can adapt the code to your limits. 
+  subgraph LOOP ["Repeat for every step (e.g. QC, filtering, normalization, clustering, DE)"]
+    direction LR
+    M["3 Pick the next step<br/>write what you expect to see"] --> C["4 Generate code<br/>scripts/"]
+    C --> S["5 Run on a subset<br/>logs/"]
+    S --> U["6 Understand the code<br/>and check the output"]
+    U --> D{"Does it make sense<br/>and do you understand it?"}
+    D -- "no: fix or ask" --> C
+    D -- "yes" --> UP["7 Update the plan<br/>record what you learned<br/>and re-decide the next step"]
+    UP -. "back to the plan" .-> M
+  end
 
-## Building Reports
+  UP -- "all modules done" --> F["8 Scale up<br/>full data"]
+  F --> R["9 Report<br/>"]
 
-We work with reports as the hub for our deliverable analysis. Reports enable us to tie code directly to our output figures in fixed documents. This means no orphan plots where we're not sure exactly how they were generated. 
-
-Popular examples include Quarto, Rmarkdown and Jupyter.
-
+  classDef step fill:#ffffff,stroke:#EB811B,stroke-width:2px,color:#000000,font-family:Arial
+  classDef setup fill:#23373B,stroke:#23373B,color:#ffffff,font-family:Arial
+  classDef check fill:#EB811B,stroke:#EB811B,color:#000000,font-family:Arial
+  classDef done fill:#2E8B57,stroke:#2E8B57,color:#ffffff,font-family:Arial
+  class P,E setup
+  class M,C,S,U,UP step
+  class D check
+  class F,R done
+  style LOOP fill:#f4f4f4,stroke:#23373B,stroke-width:2px
+```
 
 ## Good practice still applies
 
@@ -190,47 +238,137 @@ To summarize, even when we have LLM-assisted coding, good coding practice is sti
 - Reproducibility
 - Checkpoints and Review
 
-Ultimately you still need to understand what the analysis is doing, how it is doing it, and why it is doing that. Through this you keep your hands on the wheel. If this is too much reach out to your friendly neighborhood bioinformatician for help. 
+Ultimately you still need to understand what the analysis is doing, how it is doing it, and why it is doing that. Through this you keep your hands on the wheel. If this is too much, reach out to your friendly neighborhood bioinformatician for help. 
 
-# Hard lines {background-color="#23373B" .center .middle}
+# Bad Practice {background-color="#23373B" .center .middle}
 
+## Who is driving?
 
-## Why rules loosen over time
+A repeated analogy we have used is "who is driving?". It is very easy to give away our control.
 
-As we give more capabilities and autonomy to the LLMs we will then want to know how we define limits.  
+Claude code generally tries to make this danger clear i.e. the full permissions CLI mode is called "--dangerously-skip-permissions".
 
-Many of us may have data that we do not want shared with LLMs and/or files that we want to protect from Agents i.e. personal data, raw files, logins etc.
+That said we can achieve something similarly *risky* with a much less scary prompt:
 
-When we start a project in Claude Code or Codex this sets the scope of the project. In theory this should prevent 
-
-Generally we can provide guidleines about what we do and don't want
-
-??Why instructions can weaken over a long session (context compression), and how to guard against it??
+*Complete a scRNAseq analysis on this mouse PBMC dataset. If there are errors fix them. Keep going until you finish.*
 
 ## Controlling what is allowed
 
-??Permission settings, approval prompts, and how to restrict what the AI is allowed to do??
+As we give more capabilities and autonomy to the LLMs we will also need clearly defined limits.  
 
+Many of us may have data that we do not want shared with LLMs and/or files that we want to protect from Agents i.e. personal data, raw files, logins etc.
 
+When we start a project in Claude Code or Codex this sets the scope of the project. In theory this should prevent it interacting outside of this. 
 
+## Controlling what is allowed
 
-## Time for an exercise! {#time-for-an-exercise}
+In the context section we saw that CLAUDE.md/Agents.md can only *ask* the agent to stay away from specific directories, functions or methods: they are guides.
 
-Exercise on hallucinations and maybe genrating a multi-step workflow can be found [here](../../exercises/exercises/Exercise_Hallucination_exercise.html)
+To outright ban them, use [settings](https://code.claude.com/docs/en/settings-reference#permissions) permissions or hooks, which the harness enforces.
 
-## Answers to exercise
+Examples: [project settings.json](https://github.com/RockefellerUniversity/responsible_use_of_AI_for_noncoders/blob/master/docs/data/claude_examples/project/.claude/settings.json){target="_blank"} · [a hook that protects raw data](https://github.com/RockefellerUniversity/responsible_use_of_AI_for_noncoders/blob/master/docs/data/claude_examples/project/.claude/hooks/protect-raw.sh){target="_blank"}
 
-Answers can be found [here](../../exercises/answers/Exercise_Hallucination_answers.html)
+## Hard lines
+
+```{mermaid}
+flowchart TB
+  subgraph ROW [" "]
+    direction LR
+    AI["AI proposes an action<br/>e.g. delete files, install packages"]
+    L1["Layer 1<br/>CLAUDE.md / AGENTS.md<br/><i>advisory: can be ignored or lost in a long session</i>"]
+    L2["Layer 2<br/>Permission settings and deny rules<br/><i>enforced by the app</i>"]
+    L3["Layer 3<br/>Human review<br/>"]
+    OK(["Safe outcome"])
+    AI --> L1 --> L2 --> L3 --> OK
+  end
+
+  subgraph BASE [" "]
+    NET["<div style='width:640px'>SAFETY NET: backups · git history · read-only raw data<br/><i>if every layer above fails, you can undo it</i></div>"]
+  end
+
+  ROW ~~~ BASE
+
+  classDef ai fill:#EB811B,stroke:#EB811B,color:#000000,font-family:Arial
+  classDef layer fill:#ffffff,stroke:#EB811B,stroke-width:2px,color:#000000,font-family:Arial
+  classDef human fill:#23373B,stroke:#23373B,color:#ffffff,font-family:Arial
+  classDef net fill:#2F6FA8,stroke:#2F6FA8,color:#ffffff,font-family:Arial
+  classDef ok fill:#2E8B57,stroke:#2E8B57,color:#ffffff,font-family:Arial
+  class AI ai
+  class L1,L2 layer
+  class L3 human
+  class NET net
+  class OK ok
+  style ROW fill:none,stroke:none
+  style BASE fill:none,stroke:none
+```
+
+## LLMs find a way
+
+The way we instruct these tools can accidentally give them freedom beyond what we allow. It doesn't have to be as explicit as prior examples. 
+
+For example:
+
+* "Lets do the *next step in the analysis*"
+* "Give me the code for *this figure*" 
+
+In both these cases I though I was being explicit and we had a pattern of step-wise interrogation, action and review. Instead it took this as permissive instructions for it to conduct an entire analysis, or to add the code for a given figure directly into my analysis report.
+
+## Hard lines can be softer than you think
+
+Similarly we have seen hard lines which have been set flouted for similar semantic reasons i.e. do not interact with the HPC or do not commit anything without my review.
+
+This happens despite these limits being saved in CLAUDE.md files. 
+
 
 ## Further reading
 
 - Anthropic: [Models overview](https://platform.claude.com/docs/en/about-claude/models/overview) and [Transparency Hub](https://www.anthropic.com/transparency) (knowledge cutoffs, release dates, training data descriptions)
+- OpenAI: [Models overview](https://developers.openai.com/api/docs/models).
 - Kalai et al. 2025, [Why Language Models Hallucinate](https://arxiv.org/abs/2509.04664)
-- Ji et al. 2023, "Survey of Hallucination in Natural Language Generation", *ACM Computing Surveys*
-- Walters & Wilder 2023, "Fabrication and errors in the bibliographic citations generated by ChatGPT", *Scientific Reports*
+- Walters & Wilder 2023, [Fabrication and errors in the bibliographic citations generated by ChatGPT](https://www.nature.com/articles/s41598-023-41032-5)
 - Kandpal et al. 2023, [Large Language Models Struggle to Learn Long-Tail Knowledge](https://arxiv.org/abs/2211.08411)
 - Liu et al. 2023, [Lost in the Middle](https://arxiv.org/abs/2307.03172)
 - Sharma et al. 2023, [Towards Understanding Sycophancy in Language Models](https://arxiv.org/abs/2310.13548)
-- Ziemann et al. 2016, "Gene name errors are widespread in the scientific literature", *Genome Biology*
-- Bravo González-Blas et al. 2023, "SCENIC+: single-cell multiomic inference of enhancers and gene regulatory networks", *Nature Methods*
 
+## Time for an exercise! {#time-for-an-exercise}
+
+Exercises can be found [here](../../exercises/exercises/Exercise_Workflow_exercise.html)
+
+## Answers to exercise
+
+Answers can be found [here](../../exercises/answers/Exercise_Workflow_answers.html) 
+
+```{=html}
+<script>
+// Mermaid draws each diagram on page load, while its slide is still hidden, and
+// sizes the node boxes from that measurement. On a slow load the boxes come out
+// too small for their text. Redraw every diagram once the first pass is done.
+(function () {
+  var srcs = Array.prototype.map.call(
+    document.querySelectorAll("pre.mermaid-js"),
+    function (p) { return p.textContent.replace(/&nbsp;/g, " "); }
+  );
+  if (!srcs.length) return;
+  window.addEventListener("load", function () {
+    var tries = 0;
+    (function wait() {
+      var svgs = document.querySelectorAll("svg.mermaid-js");
+      if (svgs.length < srcs.length && tries++ < 50) return setTimeout(wait, 200);
+      document.fonts.ready.then(async function () {
+        for (var i = 0; i < srcs.length && i < svgs.length; i++) {
+          try {
+            var out = await mermaid.mermaidAPI.render("mermaid-re-" + i, srcs[i]);
+            var tmp = document.createElement("div");
+            tmp.innerHTML = out.svg;
+            var fresh = tmp.querySelector("svg");
+            fresh.classList.add("mermaid-js");
+            svgs[i].replaceWith(fresh);
+            _quartoMermaid.postProcess(fresh);
+          } catch (e) { /* keep the original diagram */ }
+        }
+      });
+    })();
+  });
+})();
+</script>
+```

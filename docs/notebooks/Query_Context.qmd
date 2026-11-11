@@ -17,8 +17,6 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Overview
 
-*Presenter: Tom — 45 mins*
-
 - [The context window](#the-context-window)
 - [Where context comes from](#where-context-comes-from)
 - [Context compression](#context-compression)
