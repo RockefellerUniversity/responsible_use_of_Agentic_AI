@@ -211,6 +211,24 @@ The repository describes itself as "not an officially supported Google product" 
 
 Start read-only. A coding agent can already run `git` and `gh`; the server mainly helps when you also want it in claude.ai or another app.
 
+## Playwright: browser automation {.smaller}
+
+[microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp) lets the agent drive a real web browser: open pages, click, type, fill forms and take screenshots.
+
+- **Local**: runs a browser on your machine. It reads pages as structured text (the accessibility tree), not as pictures.
+- **Used for**: testing your own web apps or Shiny dashboards, checking a rendered report, collecting data from pages with no download option.
+- **Signed in as you**: by default it keeps a browser profile, so logins are saved between sessions. Use `--isolated` for a fresh, throwaway profile each time.
+
+```{shell, eval=FALSE}
+claude mcp add playwright -- npx @playwright/mcp@latest --isolated
+```
+
+::: {.callout-warning title="A high-risk connector"}
+It reads untrusted web pages **and** can act on them (click, submit, post). That is the prompt-injection combination from the Security section. Its own docs say it is **not a security boundary**.
+:::
+
+Microsoft also suggests that coding agents use **Playwright CLI with skills** instead: the same actions, but fewer tokens, since large page snapshots don't fill the context.
+
 ## Summary: popular servers {.smaller}
 
 | Server | Source | Local / remote | Used for |
@@ -220,6 +238,7 @@ Start read-only. A coding agent can already run `git` and `gh`; the server mainl
 | Microsoft 365 | [microsoft/mcp](https://github.com/microsoft/mcp) | Remote (set up by IT) | Mail, Calendar, Teams, OneDrive, SharePoint |
 | Google Workspace | [google/mcp](https://github.com/google/mcp) | Local | Docs, Sheets, Slides, Calendar, Gmail |
 | GitHub | [github/github-mcp-server](https://github.com/github/github-mcp-server) | Remote or local | Repositories, issues, pull requests |
+| Playwright | [microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp) | Local | Driving a web browser |
 | AWS | [awslabs/mcp](https://github.com/awslabs/mcp) | Mostly local | Amazon Web Services and their docs |
 
 Find more in the [official MCP registry](https://registry.modelcontextprotocol.io) or [awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers). **Prefer official servers from the company that owns the service:** a server can read and act on your data.
