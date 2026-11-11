@@ -461,7 +461,7 @@ This allows for a univeral review skill that minimizes token usage by ignoring i
 ```
 
 ```{r, echo=FALSE, results='asis'}
-skill <- readLines("../../data/bio-review-SKILL.md")
+skill <- readLines("../data/bio-review-SKILL.md")
 yaml_end <- which(skill == "---")[2]
 skill_body <- paste(skill[(yaml_end + 1):length(skill)], collapse = "\n")
 skill_html <- commonmark::markdown_html(skill_body, extensions = TRUE)
