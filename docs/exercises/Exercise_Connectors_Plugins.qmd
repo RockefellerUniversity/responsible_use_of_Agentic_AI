@@ -19,14 +19,100 @@ toMessage <- ifelse(!is.null(params$toMessage), params$toMessage, FALSE)
 ```
 
 <p>&nbsp;</p>
-These exercises are about connecting an AI assistant to other services and installing plugins.
+These exercises are about connecting a coding agent to other services with MCP servers, and checking plugins before you install them.
 
 **Do not paste protected or unpublished data into any AI tool.**
 
-**Exercise 1** - **Query a connector**
+**Exercise 1** - **Check a plugin before you install it**
 
-- ??Enable a connector, ask a question that needs it, and check where the answer came from. What did the connector have access to???
+Look at the `bio-research` plugin in [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins/tree/main/bio-research){target="_blank"}. Without installing it, open its files on GitHub.
+
+- Does it have a `hooks/` or `agents/` folder? What would run automatically if you installed it?
+- How many MCP servers does its `.mcp.json` add, and **who runs each one**?
+- What would leave your computer when you use them?
+- Would you install all of it? What would you do instead?
 
 ```{asis, echo=toMessage}
-??Answer??
+Looking at the plugin on GitHub (November 2026):
+
+- **No `hooks/` or `agents/` folder.** Nothing runs automatically: the skills and connectors are only used when the agent chooses to use them. Check this again before you install, because an update could add hooks.
+- **6 skills:** instrument-data-to-allotrope, nextflow-development, scientific-problem-selection, scvi-tools, single-cell-rna-qc, start.
+- **11 MCP servers**, all remote (`https://…`), run by different organisations:
+
+| Server | Run by |
+|---|---|
+| PubMed, bioRxiv, clinical trials, ChEMBL | Anthropic-hosted (`*.mcp.claude.com`) |
+| BioRender | BioRender |
+| Consensus | Consensus |
+| Synapse | Sage Bionetworks (synapse.org) |
+| Wiley | Wiley, via scholargateway.ai |
+| Owkin | Owkin |
+| Open Targets | Open Targets |
+| Benchling | Benchling |
+
+What this means:
+
+- **What leaves your computer:** every question the agent sends to a connector (search terms, gene names, sometimes text from your conversation) goes to that organisation's server. Check each one's terms before using it with unpublished work.
+- **Context cost:** Claude Code loads only the tool names until a tool is needed, but other apps may load every tool description into every session.
+- **Instead:** install only what you need. You can turn individual connectors off with `/mcp`, so you could keep, say, PubMed and Open Targets and switch off the rest. If you only want one skill, copy that skill rather than the whole plugin.
+- **Who publishes it matters.** This plugin comes from Anthropic's own repository, but most of the servers it connects to are third parties. Check them the way you would check any software.
+```
+
+**Exercise 2** - **The same question, with and without Context7**
+
+Pick an R or Python package you use that has had a major release in the last year (for example a Seurat, Scanpy or Bioconductor package).
+
+- In a new session, **without** any docs connector, ask the agent how to do one specific thing with the newest version. Note the functions and arguments it suggests.
+- Add Context7 (`claude mcp add --transport http context7 https://mcp.context7.com/mcp`), start a new session, and ask the same question with "use context7" at the end.
+- Compare the two answers against the package's current documentation. Which functions or arguments were out of date or invented?
+
+```{asis, echo=toMessage}
+What you are likely to see:
+
+- Without Context7 the answer follows the version the model saw most in training, so it may use renamed functions, old arguments or an old workflow, and it will sound just as confident.
+- With Context7 you should see the agent call `resolve-library-id` and then `query-docs` before answering. The answer should match the current docs more closely.
+- **Still check:** Context7 can pick the wrong library or version. Look at which library ID it used, and check every function against the package's help page before you run it.
+- **What left your computer:** the library name and your question went to Context7's servers. That is fine for public package names, but don't paste unpublished text into a docs query.
+```
+
+**Exercise 3** - **Lock a connector down**
+
+Add the GitHub MCP server, or another server with both read and write tools, to a **test project**.
+
+- Type `/mcp` and list the tools it offers. Which ones can change something (create, update, delete, merge)?
+- Add a `deny` rule to the project's `.claude/settings.json` for one of those write tools, and an `ask` rule for the rest of the server.
+- Ask the agent to use the denied tool. What happens?
+
+```{asis, echo=toMessage}
+An example `.claude/settings.json`:
+
+    {
+      "permissions": {
+        "deny": ["mcp__github__create_pull_request"],
+        "ask":  ["mcp__github__*"]
+      }
+    }
+
+- The denied tool is blocked by Claude Code itself, whatever the prompt says. A line in CLAUDE.md saying "never open pull requests" would only be a request.
+- Every other GitHub tool now asks for your approval before it runs.
+- Even better: start from read-only. The GitHub server's `--read-only` mode doesn't offer write tools at all, and a read-only token can't write even if a rule is missed.
+- The server name in the rule must match the name you gave it in `claude mcp add`. Tools from a plugin's server are named `mcp__plugin_<plugin>_<server>__<tool>`.
+```
+
+**Exercise 4** - **Find the hooks**
+
+Pick any plugin you have installed, or one from a public marketplace such as [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official){target="_blank"}.
+
+- Open its `hooks/` folder (or the `hooks` entry in `.claude-plugin/plugin.json`). Which events does it hook into?
+- For each hook, what command does it run? Open the script it calls.
+- Does anything it does leave your computer, or add to the agent's context without you seeing it?
+
+```{asis, echo=toMessage}
+What to look for:
+
+- **The event:** `SessionStart` and `UserPromptSubmit` hooks often add text to the agent's context; `PreToolUse` hooks can block or allow tools; `PostToolUse` and `Stop` hooks often log or tidy up.
+- **The command:** it usually calls a script in the plugin folder. That script runs with your permissions, every time the event happens, without asking.
+- **Network calls:** look for `curl`, `fetch`, `http`, webhooks or URLs in the script. Some plugins send usage data to a dashboard as a feature; check whether it is on by default and what it sends.
+- **Several hook files:** plugins that support several apps often ship one hook file per app. Check the one your app uses.
+- If a plugin has hooks you don't understand, don't install it, or copy only the skill you need.
 ```

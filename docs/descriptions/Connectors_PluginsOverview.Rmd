@@ -2,7 +2,9 @@
 
 Connecting an AI assistant to other services and data, and extending it with plugins.
 
-* Connectors and the Model Context Protocol (MCP)
-* Plugins: bundles of skills, connectors and commands
-* Security and data considerations
-* Exercises: querying a connector
+* Connectors and the Model Context Protocol (MCP): what they are and why they are used
+* Tool descriptions: what the model sees and how it chooses a tool
+* Popular servers: Context7, Microsoft, Google and GitHub
+* Security: what leaves your machine, prompt injection and least privilege
+* Plugins, including the agents and hooks inside them
+* Exercises: checking a plugin, Context7, locking down a connector, finding hooks
