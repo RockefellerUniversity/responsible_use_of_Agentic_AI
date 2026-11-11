@@ -7,4 +7,5 @@ Connecting an AI assistant to other services and data, and extending it with plu
 * Popular servers: Context7, Microsoft, Google and GitHub
 * Security: what leaves your machine, prompt injection and least privilege
 * Plugins, including the agents and hooks inside them
+* Sharing plugins with your lab, and building your own server
 * Exercises: checking a plugin, Context7, locking down a connector, finding hooks

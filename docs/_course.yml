@@ -38,11 +38,12 @@ Presentations:
     PresRmd: Strengths_Limitations.qmd
     PresOverviewRmd: Strengths_LimitationsOverview.Rmd
     Exercises:
-      - Exercise_Hallucination.qmd
+      - Exercise_StrengthsLimitations.qmd
   - title: AI in Your Workflow
     PresRmd: AI_Workflow.qmd
     PresOverviewRmd: AI_WorkflowOverview.Rmd
-    Exercises: []
+    Exercises:
+      - Exercise_Workflow.qmd
   - title: BRC and AI Tools
     PresRmd: BRC_AI_Tools.qmd
     PresOverviewRmd: BRC_AI_ToolsOverview.Rmd
