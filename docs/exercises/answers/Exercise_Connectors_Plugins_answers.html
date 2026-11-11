@@ -8,7 +8,7 @@
 
 <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre">
 
-<title>Exercise: Provoking a Hallucination</title>
+<title>Exercise: Connectors and Plugins</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -3043,7 +3043,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Exercise: Provoking a Hallucination</h1>
+<h1 class="title">Exercise: Connectors and Plugins</h1>
 </div>
 
 
@@ -3075,27 +3075,131 @@ vertical-align: -.125em;
 <p>
  
 </p>
-<p>These exercises are about hallucinations and the limits of what a model knows.</p>
+<p>These exercises are about connecting a coding agent to other services with MCP servers, and checking plugins before you install them.</p>
 <p><strong>Do not paste protected or unpublished data into any AI tool.</strong></p>
-<p><strong>Exercise 1</strong> - <strong>Recent knowledge</strong></p>
+<p><strong>Exercise 1</strong> - <strong>Check a plugin before you install it</strong></p>
+<p>Look at the <code>bio-research</code> plugin in <a href="https://github.com/anthropics/knowledge-work-plugins/tree/main/bio-research" target="_blank">anthropics/knowledge-work-plugins</a>. Without installing it, open its files on GitHub.</p>
 <ul>
-<li>Ask an AI assistant, with web search turned off, about a very recent event, publication or software release. How does it respond? Does it acknowledge that it doesn’t know?</li>
+<li>Does it have a <code>hooks/</code> or <code>agents/</code> folder? What would run automatically if you installed it?</li>
+<li>How many MCP servers does its <code>.mcp.json</code> add, and <strong>who runs each one</strong>?</li>
+<li>What would leave your computer when you use them?</li>
+<li>Would you install all of it? What would you do instead?</li>
 </ul>
 <div class="cell">
-<p>Without web search the model can only draw on its training data, which stops at its training cutoff. It may say it doesn’t know, or it may produce a confident but outdated or invented answer.</p>
+<p>Looking at the plugin on GitHub (November 2026):</p>
+<ul>
+<li><strong>No <code>hooks/</code> or <code>agents/</code> folder.</strong> Nothing runs automatically: the skills and connectors are only used when the agent chooses to use them. Check this again before you install, because an update could add hooks.</li>
+<li><strong>6 skills:</strong> instrument-data-to-allotrope, nextflow-development, scientific-problem-selection, scvi-tools, single-cell-rna-qc, start.</li>
+<li><strong>11 MCP servers</strong>, all remote (<code>https://…</code>), run by different organisations:</li>
+</ul>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Server</th>
+<th>Run by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PubMed, bioRxiv, clinical trials, ChEMBL</td>
+<td>Anthropic-hosted (<code>*.mcp.claude.com</code>)</td>
+</tr>
+<tr class="even">
+<td>BioRender</td>
+<td>BioRender</td>
+</tr>
+<tr class="odd">
+<td>Consensus</td>
+<td>Consensus</td>
+</tr>
+<tr class="even">
+<td>Synapse</td>
+<td>Sage Bionetworks (synapse.org)</td>
+</tr>
+<tr class="odd">
+<td>Wiley</td>
+<td>Wiley, via scholargateway.ai</td>
+</tr>
+<tr class="even">
+<td>Owkin</td>
+<td>Owkin</td>
+</tr>
+<tr class="odd">
+<td>Open Targets</td>
+<td>Open Targets</td>
+</tr>
+<tr class="even">
+<td>Benchling</td>
+<td>Benchling</td>
+</tr>
+</tbody>
+</table>
+<p>What this means:</p>
+<ul>
+<li><strong>What leaves your computer:</strong> every question the agent sends to a connector (search terms, gene names, sometimes text from your conversation) goes to that organisation’s server. Check each one’s terms before using it with unpublished work.</li>
+<li><strong>Context cost:</strong> Claude Code loads only the tool names until a tool is needed, but other apps may load every tool description into every session.</li>
+<li><strong>Instead:</strong> install only what you need. You can turn individual connectors off with <code>/mcp</code>, so you could keep, say, PubMed and Open Targets and switch off the rest. If you only want one skill, copy that skill rather than the whole plugin.</li>
+<li><strong>Who publishes it matters.</strong> This plugin comes from Anthropic’s own repository, but most of the servers it connects to are third parties. Check them the way you would check any software.</li>
+</ul>
 </div>
-<p><strong>Exercise 2</strong> - <strong>Invoke a hallucination</strong></p>
+<p><strong>Exercise 2</strong> - <strong>The same question, with and without Context7</strong></p>
+<p>Pick an R or Python package you use that has had a major release in the last year (for example a Seurat, Scanpy or Bioconductor package).</p>
 <ul>
-<li>Try to get the assistant to give a confident but wrong answer. For example, ask for references on a narrow topic, or about the function of a gene or software option that doesn’t exist. Check every claim against a trusted source.</li>
+<li>In a new session, <strong>without</strong> any docs connector, ask the agent how to do one specific thing with the newest version. Note the functions and arguments it suggests.</li>
+<li>Add Context7 (<code>claude mcp add --transport http context7 https://mcp.context7.com/mcp</code>), start a new session, and ask the same question with “use context7” at the end.</li>
+<li>Compare the two answers against the package’s current documentation. Which functions or arguments were out of date or invented?</li>
 </ul>
 <div class="cell">
-<p>??Examples of prompts that reliably produce hallucinations, and how to check them??</p>
+<p>What you are likely to see:</p>
+<ul>
+<li>Without Context7 the answer follows the version the model saw most in training, so it may use renamed functions, old arguments or an old workflow, and it will sound just as confident.</li>
+<li>With Context7 you should see the agent call <code>resolve-library-id</code> and then <code>query-docs</code> before answering. The answer should match the current docs more closely.</li>
+<li><strong>Still check:</strong> Context7 can pick the wrong library or version. Look at which library ID it used, and check every function against the package’s help page before you run it.</li>
+<li><strong>What left your computer:</strong> the library name and your question went to Context7’s servers. That is fine for public package names, but don’t paste unpublished text into a docs query.</li>
+</ul>
 </div>
+<p><strong>Exercise 3</strong> - <strong>Lock a connector down</strong></p>
+<p>Add the GitHub MCP server, or another server with both read and write tools, to a <strong>test project</strong>.</p>
 <ul>
-<li>How did the tone of the wrong answer compare to the tone of a correct one?</li>
+<li>Type <code>/mcp</code> and list the tools it offers. Which ones can change something (create, update, delete, merge)?</li>
+<li>Add a <code>deny</code> rule to the project’s <code>.claude/settings.json</code> for one of those write tools, and an <code>ask</code> rule for the rest of the server.</li>
+<li>Ask the agent to use the denied tool. What happens?</li>
 </ul>
 <div class="cell">
-<p>Often there is no difference. The model is trained to produce plausible text, so a wrong answer can be written just as confidently as a correct one.</p>
+<p>An example <code>.claude/settings.json</code>:</p>
+<pre><code>{
+  &quot;permissions&quot;: {
+    &quot;deny&quot;: [&quot;mcp__github__create_pull_request&quot;],
+    &quot;ask&quot;:  [&quot;mcp__github__*&quot;]
+  }
+}</code></pre>
+<ul>
+<li>The denied tool is blocked by Claude Code itself, whatever the prompt says. A line in CLAUDE.md saying “never open pull requests” would only be a request.</li>
+<li>Every other GitHub tool now asks for your approval before it runs.</li>
+<li>Even better: start from read-only. The GitHub server’s <code>--read-only</code> mode doesn’t offer write tools at all, and a read-only token can’t write even if a rule is missed.</li>
+<li>The server name in the rule must match the name you gave it in <code>claude mcp add</code>. Tools from a plugin’s server are named <code>mcp__plugin_&lt;plugin&gt;_&lt;server&gt;__&lt;tool&gt;</code>.</li>
+</ul>
+</div>
+<p><strong>Exercise 4</strong> - <strong>Find the hooks</strong></p>
+<p>Pick any plugin you have installed, or one from a public marketplace such as <a href="https://github.com/anthropics/claude-plugins-official" target="_blank">anthropics/claude-plugins-official</a>.</p>
+<ul>
+<li>Open its <code>hooks/</code> folder (or the <code>hooks</code> entry in <code>.claude-plugin/plugin.json</code>). Which events does it hook into?</li>
+<li>For each hook, what command does it run? Open the script it calls.</li>
+<li>Does anything it does leave your computer, or add to the agent’s context without you seeing it?</li>
+</ul>
+<div class="cell">
+<p>What to look for:</p>
+<ul>
+<li><strong>The event:</strong> <code>SessionStart</code> and <code>UserPromptSubmit</code> hooks often add text to the agent’s context; <code>PreToolUse</code> hooks can block or allow tools; <code>PostToolUse</code> and <code>Stop</code> hooks often log or tidy up.</li>
+<li><strong>The command:</strong> it usually calls a script in the plugin folder. That script runs with your permissions, every time the event happens, without asking.</li>
+<li><strong>Network calls:</strong> look for <code>curl</code>, <code>fetch</code>, <code>http</code>, webhooks or URLs in the script. Some plugins send usage data to a dashboard as a feature; check whether it is on by default and what it sends.</li>
+<li><strong>Several hook files:</strong> plugins that support several apps often ship one hook file per app. Check the one your app uses.</li>
+<li>If a plugin has hooks you don’t understand, don’t install it, or copy only the skill you need.</li>
+</ul>
 </div>
 
 </main>
