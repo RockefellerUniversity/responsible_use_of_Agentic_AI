@@ -86,3 +86,46 @@ runs:
           branch = "${{ inputs.branch }}",
           freeze = !as.logical("${{ inputs.full-rebuild }}")
         )
+
+    ## Diagnostics: the engine calls quarto_render(quiet = TRUE), so a failed
+    ## render only reports "Error returned by quarto CLI" with no file name or
+    ## message. When the compile step fails, re-render every source verbosely
+    ## (one log group per file) so the failing file and the real error are in the
+    ## log. Runs only on failure; output is written next to the sources in the CI
+    ## workspace and is never committed (the publish step is skipped on failure).
+    - name: Diagnose render failures (verbose)
+      if: failure()
+      shell: Rscript {0}
+      run: |
+        nb <- list.files("docs/notebooks", "\\.qmd$", full.names = TRUE)
+        ex <- list.files("docs/exercises", "\\.qmd$", full.names = TRUE)
+        sources <- data.frame(file = c(nb, ex),
+                              to = c(rep("revealjs", length(nb)), rep("html", length(ex))))
+        failed <- character()
+        for (i in seq_len(nrow(sources))) {
+          f <- sources$file[i]
+          cat("::group::quarto render", f, "--to", sources$to[i], "\n")
+          out <- system2("quarto", c("render", shQuote(f), "--to", sources$to[i]),
+                         stdout = TRUE, stderr = TRUE)
+          status <- attr(out, "status")
+          if (is.null(status)) status <- 0L
+          cat(out, sep = "\n")
+          cat("::endgroup::\n")
+          if (status != 0L) {
+            failed <- c(failed, f)
+            ## Annotation surfaces the file and the last lines of the error on the run summary.
+            ## Start from the first "Error"/"Quitting from" line (the real cause);
+            ## fall back to the tail if the output has neither.
+            lines <- out[nzchar(out)]
+            hit <- grep("Error|Quitting from", lines)
+            lines <- if (length(hit)) utils::head(lines[hit[1]:length(lines)], 10) else utils::tail(lines, 10)
+            msg <- paste(gsub("\033\\[[0-9;]*m", "", lines), collapse = "%0A")
+            cat(sprintf("::error file=%s::quarto render failed (exit %d)%%0A%s\n", f, status, msg))
+          }
+        }
+        if (length(failed)) {
+          cat("\nFAILED:\n", paste0(" - ", failed, collapse = "\n"), "\n")
+          quit(status = 1)
+        } else {
+          cat("\nAll sources rendered individually; the failure is in the engine's own steps, not a .qmd.\n")
+        }
