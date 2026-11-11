@@ -336,8 +336,6 @@ Both Claude Code and Codex have skills that help guide you through making a new 
 
 In reality, your most useful skills will be made by the LLM, but are built from your actual analyses. The skill creator is designed to turn key discussion points within your session into facets of the skill.
 
-*e.g. Cell type X generally has higher mitochondrial reads, the starting threshold should be 10%, not 5%*
-
 This allows the model to identify packages you prefer, plot styles you like, important thresholds or quirks related to your studies, key decision points or edge cases, and to include this information in the skill. 
 
 Specifics related to your work increase the value of a skill beyond just simply asking the model to do that task with no skill present. 
@@ -534,14 +532,18 @@ Anthropic and OpenAI have marketplaces with many useful plugins, but you can add
 
 - **Install from a marketplace:** Marketplaces contain plugins, each of which has their own set of skills.
 
+In the app or the CLI, you can just type in `/plugin` and navigate through the options to first add a marketplace and then install a plugin.
+
 ::: {.columns}
 
 ::: {.column width="50%"}
-In the app or the CLI, you can just type in `/plugin` and navigate through the options to first add a marketplace and then install a plugin.
+![](../imgs/plugins_app.png){width=90% fig-align="center"}
 :::
 
 ::: {.column width="50%"}
-![](../imgs/plugin_menu.png){width=100% fig-align="center"}
+
+
+![](../imgs/plugin_menu.png){width=90% fig-align="center"}
 :::
 :::
 
@@ -551,7 +553,7 @@ In the app or the CLI, you can just type in `/plugin` and navigate through the o
 
 You can also do this explicitly on the command line.
 
-Claude Code:
+**Claude Code:**
 ```{shell, eval=FALSE}
 # add marketplace from any github repository
 /plugin marketplace add <owner>/<repo> # e.g. anthropics/claude-plugins-official 
@@ -560,7 +562,7 @@ Claude Code:
 /plugin install <plugin-name>@<marketplace-alias> # e.g. skill-creator@claude-plugins-official 
 ```
 
-Codex:
+**Codex:**
 ```{shell, eval=FALSE}
 /plugin marketplace add <owner>/<repo> # add marketplace
 /plugin add <plugin-name>@<marketplace-alias> # install plugin from that marketplace
