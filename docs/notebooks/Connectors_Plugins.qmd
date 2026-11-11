@@ -17,25 +17,489 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 ## Overview
 
-- [Connectors and MCP](#connectors-and-mcp)
+- [What connectors are](#what-connectors-are)
+- [Tool descriptions](#tool-descriptions)
+- [Popular MCP servers](#popular-mcp-servers)
+- [Security](#security)
 - [Plugins](#plugins)
-- [Security and data considerations](#security-and-data-considerations)
+- [Agents in plugins](#agents-in-plugins)
+- [Hooks in plugins](#hooks-in-plugins)
 - [Exercises](#time-for-an-exercise)
 
-# Connectors and Plugins {background-color="#23373B" .center .middle}
+# What connectors are {#what-connectors-are background-color="#23373B" .center .middle}
 
-## Connectors and MCP
+## Connectors
 
-??Connectors, introducing the Model Context Protocol (MCP) as the standard way to connect an AI tool to other services and data; grounding answers in your own documents??
+Connectors let a coding agent use third-party software, apps and web services through a **defined catalogue of actions**.
 
-## Plugins
+- The agent can call the actions the connector offers, and nothing else.
+- This lets it work with real data and real tools, with guardrails.
 
-??Plugins as bundles of skills, connectors and commands, and where to find them??
+The **Model Context Protocol (MCP)** is the standard way to build connectors. It was started by Anthropic and is now used by Claude, Codex, Copilot, Gemini and others.
 
-## Security and data considerations
+"Connectors" in claude.ai and "MCP servers" in Claude Code or Codex are the same thing.
 
-??What a connector can see and do, permissions, trusting third-party plugins, and Rockefeller data policy??
+## How MCP works
+
+```{mermaid}
+flowchart LR
+  A["<b>Agent</b><br/>Claude Code / Codex"] -- "calls a tool<br/>with inputs" --> S["<b>MCP server</b><br/>a catalogue of tools"]
+  S -- "returns a result" --> A
+  S --> X[("Service or data<br/>GitHub · Google · Microsoft 365<br/>docs · your lab database")]
+
+  classDef agent fill:#23373B,stroke:#23373B,color:#ffffff,font-family:Arial
+  classDef server fill:#EB811B,stroke:#EB811B,color:#000000,font-family:Arial
+  class A agent
+  class S server
+```
+
+- Each server has a description, and each **tool** has a name, a description and a list of inputs.
+- The agent sees those descriptions and can call the tools. It cannot see or change the server's internals.
+
+## Local and remote servers {.smaller}
+
+| | **Local** (stdio) | **Remote** (HTTP) |
+|---|---|---|
+| Runs | On your computer, started by the agent | On someone else's server |
+| Example | MarkItDown: converts your Word/PDF files to text | GitHub, Context7, Microsoft 365 |
+| Your data | Stays on your machine (unless the tool calls out) | Every request goes to whoever runs the server |
+| Sign-in | Usually none, or an API key in an environment variable | Usually a browser login (OAuth) or an API key |
+
+**Whether a server is local or remote decides where your data goes.** Check this before you add one.
+
+## Why use connectors?
+
+- **Current information.** The model's knowledge stops at its training cutoff. A docs connector like Context7 gives it today's documentation (remember the SCENIC+ example in *What AI Is Good and Bad At*).
+- **Your real tools.** The agent can read an issue, a spreadsheet or a calendar directly, instead of you copying and pasting.
+- **Guardrails.** The agent can only do what the tools allow, and you can switch individual tools off.
+- **Shared setup.** One server works across Claude Code, Codex and other apps.
+
+## When you don't need one
+
+Connectors are not always the best route.
+
+- If a **command-line tool** already does the job (`gh` for GitHub, `aws`, `gcloud`), a coding agent can usually just run it.
+- If the task is **your own analysis step**, a skill with a script is simpler and easier to read.
+
+A connector earns its place when you need sign-in handled for you, a fixed set of actions the agent cannot step outside, or the same service in several apps.
+
+## Adding a server
+
+You can ask the agent to add a server for you, but it helps to know what it is doing.
+
+```{shell, eval=FALSE}
+# Claude Code: remote server
+claude mcp add --transport http github https://api.githubcopilot.com/mcp/
+
+# Claude Code: local server (everything after -- is the command to run)
+claude mcp add --transport stdio markitdown -- uvx markitdown-mcp
+
+# Codex
+codex mcp add github --url https://api.githubcopilot.com/mcp/
+codex mcp add markitdown -- uvx markitdown-mcp
+```
+
+Type `/mcp` in a Claude Code session to see each server's status, sign in, and turn servers or tools on and off.
+
+## Where the setting is saved
+
+In Claude Code, `--scope` decides who gets the server:
+
+| Scope | Available in | Saved in |
+|---|---|---|
+| `local` (default) | This project, just for you | `~/.claude.json` |
+| `project` | Everyone who opens this project | `.mcp.json` in the project folder (commit it to share) |
+| `user` | All your projects | `~/.claude.json` |
+
+Codex keeps servers in `~/.codex/config.toml`, or in a project's `.codex/config.toml`.
+
+**Never put an API key in `.mcp.json` or any file you commit.** Use an environment variable instead.
+
+# Tool descriptions {#tool-descriptions background-color="#23373B" .center .middle}
+
+## What the model actually sees
+
+This is roughly what the agent sees for one of Context7's two tools:
+
+```{.yaml}
+name: query-docs
+description: Retrieves up-to-date documentation and code examples
+  for a library. Call resolve-library-id first to get the library ID.
+inputs:
+  libraryId: string   # required, e.g. "/vercel/next.js"
+  query: string       # required, what you want to know
+  language: string    # optional
+```
+
+The agent never sees Context7's code, only this description. Everything it knows about when and how to use the tool comes from here.
+
+## The description decides when a tool is used
+
+As with skills (*A good description is key* in the Skills session), the description is how the model decides which tool to call.
+
+- A **vague** description: the tool is called when it shouldn't be, or the wrong tool is picked.
+- A **narrow** description: the tool is never used, and the model falls back on its own memory.
+- **Overlapping** servers (two search tools, two GitHub tools) make the choice harder. Install one of each.
+
+You can nudge the choice in your prompt ("use context7") or in CLAUDE.md ("Always use Context7 for library documentation").
+
+## Tool descriptions and context
+
+Tool descriptions take up context, just like skill descriptions.
+
+- **Claude Code** loads only tool *names* at the start of a session and fetches a tool's full description when it needs it (*tool search*). This is on by default.
+- **Other apps** may load every tool description into every session. Ten servers with 40 tools each can fill a lot of context before you type anything.
+
+Either way: **install only the servers you use**, and switch off the ones you don't need for this project.
+
+# Popular MCP servers {#popular-mcp-servers background-color="#23373B" .center .middle}
+
+## Context7: up-to-date documentation
+
+[upstash/context7](https://github.com/upstash/context7) fetches current, version-specific documentation and code examples for software libraries.
+
+- **Remote** server: `https://mcp.context7.com/mcp`. A free API key gives higher rate limits.
+- Two tools: `resolve-library-id` finds the library, then `query-docs` fetches the docs.
+- Add "use context7" to a prompt, or name the library directly: "use library /satijalab/seurat".
+
+```{shell, eval=FALSE}
+claude mcp add --transport http context7 https://mcp.context7.com/mcp
+```
+
+Best for packages that change quickly, or that had a major release after the model's training cutoff.
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+Context7's own setup tool is `npx ctx7 setup`, which also installs a skill. The plain `claude mcp add` line is shown so students see what is actually configured.
+Its queries go to Upstash's servers: fine for public package names, but don't paste unpublished text into a docs query.
+:::
+:::::
+
+## Microsoft
+
+[microsoft/mcp](https://github.com/microsoft/mcp) is Microsoft's catalogue of official servers.
+
+- **MarkItDown** (local): converts Word, Excel, PowerPoint, PDF, HTML, CSV and more into Markdown the agent can read. Runs on your machine. Image captioning and audio transcription use web services.
+- **Microsoft 365** (remote): Mail, Calendar, Teams, Word, OneDrive and SharePoint. These run in your organisation's Microsoft tenant, so they are **set up by IT, not by you**.
+- **Microsoft Learn** (remote): searches Microsoft's documentation.
+- Also: Azure, SQL Server, Playwright (browser automation) and others.
+
+```{shell, eval=FALSE}
+claude mcp add --transport stdio markitdown -- uvx markitdown-mcp
+```
+
+## Google
+
+[google/mcp](https://github.com/google/mcp) lists Google's MCP servers.
+
+- **Google Workspace**: Docs, Sheets, Slides, Calendar and Gmail. It is open source and runs locally (it is packaged for Gemini CLI).
+- **Managed by Google** (remote): BigQuery, Cloud Storage, Cloud SQL, Google Maps and other Google Cloud services.
+- **MCP Toolbox for Databases**: one server for BigQuery, Cloud SQL, AlloyDB, Spanner and Firestore.
+
+::: {.callout-warning title="Check the label"}
+The repository describes itself as "not an officially supported Google product" and for demonstration purposes. Check each server's own page before relying on it.
+:::
+
+## GitHub
+
+[github/github-mcp-server](https://github.com/github/github-mcp-server) works with repositories, issues, pull requests and Actions.
+
+- **Remote**: `https://api.githubcopilot.com/mcp/`, signing in with a browser login or a personal access token.
+- **Local**: a Docker image, if you'd rather run it yourself.
+- **Toolsets**: switch on only the groups you need (e.g. `repos,issues`).
+- **Read-only mode** (`--read-only`): write tools are not offered at all.
+
+Start read-only. A coding agent can already run `git` and `gh`; the server mainly helps when you also want it in claude.ai or another app.
+
+## Playwright: browser automation {.smaller}
+
+[microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp) lets the agent drive a real web browser: open pages, click, type, fill forms and take screenshots.
+
+- **Local**: runs a browser on your machine. It reads pages as structured text (the accessibility tree), not as pictures.
+- **Used for**: testing your own web apps or Shiny dashboards, checking a rendered report, collecting data from pages with no download option.
+- **Signed in as you**: by default it keeps a browser profile, so logins are saved between sessions. Use `--isolated` for a fresh, throwaway profile each time.
+
+```{shell, eval=FALSE}
+claude mcp add playwright -- npx @playwright/mcp@latest --isolated
+```
+
+::: {.callout-warning title="A high-risk connector"}
+It reads untrusted web pages **and** can act on them (click, submit, post). That is the prompt-injection combination from the Security section. Its own docs say it is **not a security boundary**.
+:::
+
+Microsoft also suggests that coding agents use **Playwright CLI with skills** instead: the same actions, but fewer tokens, since large page snapshots don't fill the context.
+
+## Summary: popular servers {.smaller}
+
+| Server | Source | Local / remote | Used for |
+|---|---|---|---|
+| Context7 | [upstash/context7](https://github.com/upstash/context7) | Remote | Up-to-date library documentation |
+| MarkItDown | [microsoft/markitdown](https://github.com/microsoft/markitdown) | Local | Office files and PDFs to text |
+| Microsoft 365 | [microsoft/mcp](https://github.com/microsoft/mcp) | Remote (set up by IT) | Mail, Calendar, Teams, OneDrive, SharePoint |
+| Google Workspace | [google/mcp](https://github.com/google/mcp) | Local | Docs, Sheets, Slides, Calendar, Gmail |
+| GitHub | [github/github-mcp-server](https://github.com/github/github-mcp-server) | Remote or local | Repositories, issues, pull requests |
+| Playwright | [microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp) | Local | Driving a web browser |
+| AWS | [awslabs/mcp](https://github.com/awslabs/mcp) | Mostly local | Amazon Web Services and their docs |
+
+Find more in the [official MCP registry](https://registry.modelcontextprotocol.io) or [awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers). **Prefer official servers from the company that owns the service:** a server can read and act on your data.
+
+# Security {#security background-color="#23373B" .center .middle}
+
+## What leaves your machine
+
+Every request the agent sends to a **remote** server goes to the organisation that runs it: search terms, gene names, file contents, sometimes text from your conversation.
+
+- Check who runs each server and what their terms say.
+- One plugin can add many servers from many organisations (see the exercise).
+- Rockefeller's [Responsible Use of AI Policy](https://formspolicies.rockefeller.edu/getfile.php?type=Policy&file=IT_Responsible_AI_Use_Policy_Final_docx) still applies: unpublished data, PHI and PII must not go to a service that isn't approved.
+
+## Prompt injection
+
+Text a connector reads can contain instructions: an email, a web page, a GitHub issue, a PDF.
+
+The model can't reliably tell *your* instructions from instructions hidden in the data it reads.
+
+The risk is highest when one session has all three of:
+
+1. Access to **private data** (your files, your inbox)
+2. Exposure to **untrusted content** (the web, public issues, incoming email)
+3. A way to **send data out** (posting, emailing, writing to a public repo)
+
+Avoid combining all three in one session.
+
+## Poisoned descriptions and supply chain
+
+- **Tool descriptions are instructions too.** A malicious server can hide instructions in its descriptions, and they reach the model before you do anything.
+- **Descriptions can change.** A server you checked last month can change its tools after an update.
+- **Install commands run code.** `npx some-server` or `uvx some-server` downloads and runs the latest version from the internet, with your permissions. Pin a version where you can.
+
+Treat adding a server like installing software: check who publishes it.
+
+## Least privilege
+
+Give each connector the least access that does the job.
+
+- **Read-only first**, such as GitHub's `--read-only` or a read-only token.
+- **Narrow scopes**: one repository, one folder, the toolsets you need.
+- **Block write tools** in your settings. Permission rules name MCP tools as `mcp__<server>__<tool>`:
+
+```{.json filename=".claude/settings.json"}
+{
+  "permissions": {
+    "deny": ["mcp__github__create_pull_request", "mcp__github__merge_pull_request"],
+    "ask":  ["mcp__github__*"]
+  }
+}
+```
+
+These rules are enforced by the app, unlike CLAUDE.md, which can only ask (see *Hard lines* in *AI in Your Workflow*).
+
+# Plugins {#plugins background-color="#23373B" .center .middle}
+
+## What a plugin is
+
+A plugin is a **bundle** of the things we have seen so far, installed in one step from a marketplace (see the Skills session for `/plugin install`).
+
+```{=html}
+<pre class="tree">
+my-lab-plugin/
+├── .claude-plugin/
+│   └── plugin.json   # Required: name, version, description, author
+├── skills/           # Skills (as in the Skills session)
+├── agents/           # Subagents: helpers with their own instructions
+├── hooks/
+│   └── hooks.json    # Commands that run automatically on events
+├── .mcp.json         # MCP servers (connectors)
+└── bin/              # Scripts the agent can run while the plugin is on
+</pre>
+```
+
+The BRC plugin is a real example: one MCP connector and four skills (see *BRC and AI Tools*).
+
+## Skills and connectors are chosen; hooks are not
+
+| Part | Who decides when it runs |
+|---|---|
+| Skill | The model, based on its description, or you call it |
+| MCP tool | The model, based on its description; you can require approval |
+| Agent | The model hands work to it, or you ask for it |
+| **Hook** | **Nobody.** It runs automatically every time its event happens |
+
+So when you check a plugin before installing it, look at `hooks/` and `.mcp.json` first.
+
+# Agents in plugins {#agents-in-plugins background-color="#23373B" .center .middle}
+
+## What a subagent is {.smaller}
+
+A **subagent** is a helper the main agent hands work to.
+
+- It is a Markdown file in `agents/`, with a header like a skill's: `name`, `description` (when to use it), and optionally `tools` and `model`.
+- It runs in its **own, separate context**, does the job, and returns only its final report.
+
+```{.yaml filename="agents/analysis-reviewer.md"}
+---
+name: analysis-reviewer
+description: Reviews analysis code for silent errors. Use after a
+  script is written or changed, before results are reported.
+tools: Read, Grep, Glob
+model: opus
+---
+
+You have not seen this analysis before. Look for wrong contrasts,
+logged data treated as counts, and unadjusted p-values...
+```
+
+## Why subagents are useful
+
+- **A fresh pair of eyes.** A reviewer agent hasn't seen the conversation, so it isn't anchored on the main session's assumptions. This is the idea behind the *Adversarial Review* session, built in.
+- **Cleaner context.** Messy work like searching many files or reading long logs stays in the helper's context, not yours (see *What Happens With a Query*).
+- **Limited tools.** The reviewer above can only read files. It cannot edit them or run commands.
+
+## What to watch with subagents
+
+- **You only see the summary.** A confident report can hide a skipped step. Check what it actually did before you rely on it.
+- **Its description decides when it is used**, just like a skill's or a tool's.
+- **Shared blind spots.** A subagent on the same model can share the main agent's mistakes. A different model, or a person, gives a more independent check.
+
+# Hooks in plugins {#hooks-in-plugins background-color="#23373B" .center .middle}
+
+## What a hook is {.smaller}
+
+A hook is a command that runs **automatically** at a fixed moment in a session.
+
+| Event | Runs when |
+|---|---|
+| `SessionStart` | A session starts or resumes |
+| `UserPromptSubmit` | You send a prompt |
+| `PreToolUse` | Before the agent uses a tool. **Can block it.** |
+| `PostToolUse` | After a tool has run |
+| `SubagentStart` / `SubagentStop` | A subagent starts or finishes |
+| `Stop` | The agent finishes its reply |
+
+There are many more events, but these are the ones you will meet most. Hooks run as commands with **your** permissions, and Codex supports them too.
+
+## Hooks for hard lines
+
+A `PreToolUse` hook can block an action. This one stops any edit inside `data/raw/`:
+
+```{.json filename=".claude/settings.json"}
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{ "type": "command",
+                  "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/protect-raw.sh" }]
+    }]
+  }
+}
+```
+
+## Hooks for hard lines
+
+The hook runs this script before every edit:
+
+```{.bash filename=".claude/hooks/protect-raw.sh"}
+#!/bin/bash
+# Claude Code sends the tool call as JSON on stdin. Exit code 2 blocks it.
+if grep -q '"file_path" *: *"[^"]*/data/raw/'; then
+  echo "Blocked: data/raw/ is read-only. Write to data/processed/ instead." >&2
+  exit 2
+fi
+exit 0
+```
+
+The same `hooks` block can live in a plugin's `hooks/hooks.json`, so a lab could share it.
+
+## Other good uses of hooks
+
+- **Audit trail.** Log every command the agent runs, so you can reproduce or check what happened.
+- **Tidy-up.** Format or lint code after every edit.
+- **Context at session start.** Load project notes, the date or the current git branch into context.
+
+That last one also means a plugin can change how the agent behaves **without you seeing it**. For example, the [ponytail](https://github.com/DietrichGebert/ponytail) plugin uses `SessionStart` and `UserPromptSubmit` hooks to add coding-style instructions before every session and prompt.
+
+## The risk with hooks {.smaller}
+
+Hooks are the one part of a plugin that runs code with **no decision from the agent and no prompt to you**.
+
+- Installing a plugin with hooks is like agreeing to run its scripts on every event.
+- A hook can read what you type and what the agent does, and send it elsewhere. Some plugins offer this as a feature (e.g. sending usage to a team dashboard); check whether it is on.
+- Hooks are written per app: a plugin may ship separate hook files for Claude Code, Codex and others. Check the one your app uses.
+
+::: {.callout-note title="A better way"}
+- Read `hooks/` (and the scripts it calls) before installing a plugin.
+- Prefer plugins from publishers you trust, and copy just the skill you need if that is all you want.
+- Know how to turn a plugin off: `/plugin` in Claude Code.
+:::
+
+## Managing plugins
+
+- **Turn on only what you need.** Plugins can be enabled per project. Most apps also let you switch off individual connectors inside a plugin.
+- **Updates change behaviour.** An update can change a skill, a hook or a connector without you noticing. For an analysis, note which plugin versions you used, and don't update partway through (see *Reproducibility* in *AI in Your Workflow*).
+
+## Sharing plugins with your lab
+
+A lab can keep its own marketplace in a private GitHub repository: the same skills, connectors and hooks for everyone, versioned and reviewable.
+
+Adding it to the project's `.claude/settings.json` prompts everyone who opens the project to add that marketplace. Each person still installs the plugin once.
+
+```{.json filename=".claude/settings.json"}
+{
+  "extraKnownMarketplaces": {
+    "our-lab": { "source": { "source": "github", "repo": "our-lab/lab-plugins" } }
+  },
+  "enabledPlugins": { "lab-analysis@our-lab": true }
+}
+```
+
+## Building your own server
+
+You don't need to build an MCP server for most work: an existing server, a command-line tool, or a skill with a script usually does the job.
+
+Building one makes sense when your lab has a **database or internal system** that no existing server covers, and you want controlled, signed-in access to it.
+
+The BRC server is an example: tools scoped to your lab, a preview before anything that uses compute, and instructions that forbid invented numbers. See *BRC and AI Tools*, and talk to us at [brc@rockefeller.edu](mailto:brc@rockefeller.edu) before building one.
 
 ## Time for an exercise
 
-Exercises are available [here](../exercises/exercises/Exercise_Connectors_Plugins_exercise.html).
+Exercises are available [here](../../exercises/exercises/Exercise_Connectors_Plugins_exercise.html).
+
+## Answers to exercise
+
+Answers can be found [here](../../exercises/answers/Exercise_Connectors_Plugins_answers.html)
+
+
+```{=html}
+<script>
+// Mermaid draws each diagram on page load, while its slide is still hidden, and
+// sizes the node boxes from that measurement. On a slow load the boxes come out
+// too small for their text. Redraw every diagram once the first pass is done.
+(function () {
+  var srcs = Array.prototype.map.call(
+    document.querySelectorAll("pre.mermaid-js"),
+    function (p) { return p.textContent.replace(/&nbsp;/g, " "); }
+  );
+  if (!srcs.length) return;
+  window.addEventListener("load", function () {
+    var tries = 0;
+    (function wait() {
+      var svgs = document.querySelectorAll("svg.mermaid-js");
+      if (svgs.length < srcs.length && tries++ < 50) return setTimeout(wait, 200);
+      document.fonts.ready.then(async function () {
+        for (var i = 0; i < srcs.length && i < svgs.length; i++) {
+          try {
+            var out = await mermaid.mermaidAPI.render("mermaid-re-" + i, srcs[i]);
+            var tmp = document.createElement("div");
+            tmp.innerHTML = out.svg;
+            var fresh = tmp.querySelector("svg");
+            fresh.classList.add("mermaid-js");
+            svgs[i].replaceWith(fresh);
+            _quartoMermaid.postProcess(fresh);
+          } catch (e) { /* keep the original diagram */ }
+        }
+      });
+    })();
+  });
+})();
+</script>
+```
