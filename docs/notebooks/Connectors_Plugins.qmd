@@ -160,13 +160,13 @@ Either way: **install only the servers you use**, and switch off the ones you do
 
 - **Remote** server: `https://mcp.context7.com/mcp`. A free API key gives higher rate limits.
 - Two tools: `resolve-library-id` finds the library, then `query-docs` fetches the docs.
-- Add "use context7" to a prompt, or name the library directly: "use library /satijalab/seurat".
+- Add "use context7" to a prompt, or name the library directly: "use library /aertslab/scenicplus".
 
 ```{shell, eval=FALSE}
 claude mcp add --transport http context7 https://mcp.context7.com/mcp
 ```
 
-Best for packages that change quickly, or that had a major release after the model's training cutoff.
+Best for packages that change quickly, or that had a major release after the model's training cutoff, like the SCENIC+ update the model could not see.
 
 ::::: {.content-visible when-format="revealjs"}
 ::: notes
