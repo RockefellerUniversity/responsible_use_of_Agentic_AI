@@ -1,0 +1,15 @@
+{
+  "hash": "e587e604d8919e88514c65be458ac076",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Responsible Use of Agentic AI: Adversarial Review\"\nsubtitle: \" <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html> Bioinformatics Resource Center - Rockefeller University\"\nauthor:\n  - \"[http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/](http://rockefelleruniversity.github.io/responsible_use_of_Agentic_AI/)\"\n  - \"[brc@rockefeller.edu](mailto:brc@rockefeller.edu)\"\n---\n\n\n\n\n::: {.content-hidden when-format=\"revealjs\"}\n# Responsible Use of Agentic AI: Adversarial Review\n:::\n\n## Overview\n\n- [Why review AI output adversarially?](#why-review-ai-output-adversarially)\n- [Running an adversarial review](#running-an-adversarial-review)\n- [Limits of AI reviewing AI](#limits-of-ai-reviewing-ai)\n- [Exercises](#time-for-an-exercise)\n\n# Adversarial Review {background-color=\"#23373B\" .center .middle}\n\n## Why review AI output adversarially?\n\n??Asking a model (ideally a fresh session or a different model) to find faults in work rather than confirm it; sycophancy and confirmation bias??\n\n## Running an adversarial review\n\n??Prompts and workflows for red-teaming an analysis, document or piece of code; verifying each reported issue before acting on it??\n\n## Limits of AI reviewing AI\n\n??Shared blind spots, false positives, and why the human remains the final check??\n\n## Time for an exercise\n\nExercises are available [here](../exercises/exercises/Exercise_Adversarial_Review_exercise.html).\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

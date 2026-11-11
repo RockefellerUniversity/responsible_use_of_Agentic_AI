@@ -8,7 +8,7 @@
 
 <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre">
 
-<title>Exercise: Provoking a Hallucination</title>
+<title>Exercise: Connectors and Plugins</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -3043,7 +3043,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Exercise: Provoking a Hallucination</h1>
+<h1 class="title">Exercise: Connectors and Plugins</h1>
 </div>
 
 
@@ -3075,18 +3075,36 @@ vertical-align: -.125em;
 <p>
  
 </p>
-<p>These exercises are about hallucinations and the limits of what a model knows.</p>
+<p>These exercises are about connecting a coding agent to other services with MCP servers, and checking plugins before you install them.</p>
 <p><strong>Do not paste protected or unpublished data into any AI tool.</strong></p>
-<p><strong>Exercise 1</strong> - <strong>Recent knowledge</strong></p>
+<p><strong>Exercise 1</strong> - <strong>Check a plugin before you install it</strong></p>
+<p>Look at the <code>bio-research</code> plugin in <a href="https://github.com/anthropics/knowledge-work-plugins/tree/main/bio-research" target="_blank">anthropics/knowledge-work-plugins</a>. Without installing it, open its files on GitHub.</p>
 <ul>
-<li>Ask an AI assistant, with web search turned off, about a very recent event, publication or software release. How does it respond? Does it acknowledge that it doesn’t know?</li>
+<li>Does it have a <code>hooks/</code> or <code>agents/</code> folder? What would run automatically if you installed it?</li>
+<li>How many MCP servers does its <code>.mcp.json</code> add, and <strong>who runs each one</strong>?</li>
+<li>What would leave your computer when you use them?</li>
+<li>Would you install all of it? What would you do instead?</li>
 </ul>
-<p><strong>Exercise 2</strong> - <strong>Invoke a hallucination</strong></p>
+<p><strong>Exercise 2</strong> - <strong>The same question, with and without Context7</strong></p>
+<p>Pick an R or Python package you use that has had a major release in the last year (for example a Seurat, Scanpy or Bioconductor package).</p>
 <ul>
-<li>Try to get the assistant to give a confident but wrong answer. For example, ask for references on a narrow topic, or about the function of a gene or software option that doesn’t exist. Check every claim against a trusted source.</li>
+<li>In a new session, <strong>without</strong> any docs connector, ask the agent how to do one specific thing with the newest version. Note the functions and arguments it suggests.</li>
+<li>Add Context7 (<code>claude mcp add --transport http context7 https://mcp.context7.com/mcp</code>), start a new session, and ask the same question with “use context7” at the end.</li>
+<li>Compare the two answers against the package’s current documentation. Which functions or arguments were out of date or invented?</li>
 </ul>
+<p><strong>Exercise 3</strong> - <strong>Lock a connector down</strong></p>
+<p>Add the GitHub MCP server, or another server with both read and write tools, to a <strong>test project</strong>.</p>
 <ul>
-<li>How did the tone of the wrong answer compare to the tone of a correct one?</li>
+<li>Type <code>/mcp</code> and list the tools it offers. Which ones can change something (create, update, delete, merge)?</li>
+<li>Add a <code>deny</code> rule to the project’s <code>.claude/settings.json</code> for one of those write tools, and an <code>ask</code> rule for the rest of the server.</li>
+<li>Ask the agent to use the denied tool. What happens?</li>
+</ul>
+<p><strong>Exercise 4</strong> - <strong>Find the hooks</strong></p>
+<p>Pick any plugin you have installed, or one from a public marketplace such as <a href="https://github.com/anthropics/claude-plugins-official" target="_blank">anthropics/claude-plugins-official</a>.</p>
+<ul>
+<li>Open its <code>hooks/</code> folder (or the <code>hooks</code> entry in <code>.claude-plugin/plugin.json</code>). Which events does it hook into?</li>
+<li>For each hook, what command does it run? Open the script it calls.</li>
+<li>Does anything it does leave your computer, or add to the agent’s context without you seeing it?</li>
 </ul>
 
 </main>
