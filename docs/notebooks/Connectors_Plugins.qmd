@@ -56,7 +56,7 @@ flowchart LR
 - Each server has a description, and each **tool** has a name, a description and a list of inputs.
 - The agent sees those descriptions and can call the tools. It cannot see or change the server's internals.
 
-## Local and remote servers
+## Local and remote servers {.smaller}
 
 | | **Local** (stdio) | **Remote** (HTTP) |
 |---|---|---|
@@ -310,7 +310,7 @@ So when you check a plugin before installing it, look at `hooks/` and `.mcp.json
 
 # Agents in plugins {#agents-in-plugins background-color="#23373B" .center .middle}
 
-## What a subagent is
+## What a subagent is {.smaller}
 
 A **subagent** is a helper the main agent hands work to.
 
@@ -344,7 +344,7 @@ logged data treated as counts, and unadjusted p-values...
 
 # Hooks in plugins {#hooks-in-plugins background-color="#23373B" .center .middle}
 
-## What a hook is
+## What a hook is {.smaller}
 
 A hook is a command that runs **automatically** at a fixed moment in a session.
 
@@ -375,6 +375,10 @@ A `PreToolUse` hook can block an action. This one stops any edit inside `data/ra
 }
 ```
 
+## Hooks for hard lines
+
+The hook runs this script before every edit:
+
 ```{.bash filename=".claude/hooks/protect-raw.sh"}
 #!/bin/bash
 # Claude Code sends the tool call as JSON on stdin. Exit code 2 blocks it.
@@ -395,7 +399,7 @@ The same `hooks` block can live in a plugin's `hooks/hooks.json`, so a lab could
 
 That last one also means a plugin can change how the agent behaves **without you seeing it**. For example, the [ponytail](https://github.com/DietrichGebert/ponytail) plugin uses `SessionStart` and `UserPromptSubmit` hooks to add coding-style instructions before every session and prompt.
 
-## The risk with hooks
+## The risk with hooks {.smaller}
 
 Hooks are the one part of a plugin that runs code with **no decision from the agent and no prompt to you**.
 
@@ -413,7 +417,12 @@ Hooks are the one part of a plugin that runs code with **no decision from the ag
 
 - **Turn on only what you need.** Plugins can be enabled per project. Most apps also let you switch off individual connectors inside a plugin.
 - **Updates change behaviour.** An update can change a skill, a hook or a connector without you noticing. For an analysis, note which plugin versions you used, and don't update partway through (see *Reproducibility* in *AI in Your Workflow*).
-- **Sharing with your lab.** A lab can keep its own marketplace in a private GitHub repository. Adding it to the project's `.claude/settings.json` prompts everyone who opens the project to add that marketplace. Each person still installs the plugin once.
+
+## Sharing plugins with your lab
+
+A lab can keep its own marketplace in a private GitHub repository: the same skills, connectors and hooks for everyone, versioned and reviewable.
+
+Adding it to the project's `.claude/settings.json` prompts everyone who opens the project to add that marketplace. Each person still installs the plugin once.
 
 ```{.json filename=".claude/settings.json"}
 {
@@ -439,3 +448,39 @@ Exercises are available [here](../../exercises/exercises/Exercise_Connectors_Plu
 ## Answers to exercise
 
 Answers can be found [here](../../exercises/answers/Exercise_Connectors_Plugins_answers.html)
+
+
+```{=html}
+<script>
+// Mermaid draws each diagram on page load, while its slide is still hidden, and
+// sizes the node boxes from that measurement. On a slow load the boxes come out
+// too small for their text. Redraw every diagram once the first pass is done.
+(function () {
+  var srcs = Array.prototype.map.call(
+    document.querySelectorAll("pre.mermaid-js"),
+    function (p) { return p.textContent.replace(/&nbsp;/g, " "); }
+  );
+  if (!srcs.length) return;
+  window.addEventListener("load", function () {
+    var tries = 0;
+    (function wait() {
+      var svgs = document.querySelectorAll("svg.mermaid-js");
+      if (svgs.length < srcs.length && tries++ < 50) return setTimeout(wait, 200);
+      document.fonts.ready.then(async function () {
+        for (var i = 0; i < srcs.length && i < svgs.length; i++) {
+          try {
+            var out = await mermaid.mermaidAPI.render("mermaid-re-" + i, srcs[i]);
+            var tmp = document.createElement("div");
+            tmp.innerHTML = out.svg;
+            var fresh = tmp.querySelector("svg");
+            fresh.classList.add("mermaid-js");
+            svgs[i].replaceWith(fresh);
+            _quartoMermaid.postProcess(fresh);
+          } catch (e) { /* keep the original diagram */ }
+        }
+      });
+    })();
+  });
+})();
+</script>
+```
