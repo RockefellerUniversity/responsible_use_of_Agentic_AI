@@ -1,0 +1,7 @@
+- [Who I'm working with](user_role.md): biologist, not a coder; explain in plain English, read before any explanation
+- ["Next step" means one step](feedback_one_step.md): check before running more than one analysis step
+- [Say where facts come from](feedback_sources.md): check before answering any biology or literature question
+- [Grant deadline](project_grant_deadline.md): check when planning or prioritising work
+- [Second sequencing run](project_second_run.md): check before any QC, PCA or DE analysis
+- [Key IKZF1 papers](reference_key_papers.md): check before searching the literature again
+- [BRC data server](reference_brc_server.md): check when looking for DE results or IGV sessions

@@ -1,0 +1,7 @@
+# Save this as .gitignore in your project (renamed here so it does not apply to this course repo)
+# Personal Claude Code files: keep out of git
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Data stays out of git (raw data is backed up by the sequencing core)
+data/

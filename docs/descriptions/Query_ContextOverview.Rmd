@@ -2,10 +2,8 @@
 
 What the model actually "sees" when you send a message.
 
-* The context window
-* Where context comes from beyond what you type (system prompts, memory, files, tools)
-* Instruction files: CLAUDE.md and AGENTS.md, and how to create and edit them
-* Memory files: what the model remembers between sessions, and retrieval-augmented generation (RAG)
-* Context compression in long conversations
-* How context relates to tokens, cost and model choice
-* Exercise: context and tokens
+* The prompt, tokens and the agent loop
+* The context window: where context comes from beyond what you type (system prompts, CLAUDE.md, memory, files, tools)
+* Context rot and compression in long conversations
+* Memory and retrieval augmented generation (RAG)
+* Prompt and context engineering, and exercise: context and tokens

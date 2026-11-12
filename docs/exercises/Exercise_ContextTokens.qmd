@@ -19,22 +19,182 @@ toMessage <- ifelse(!is.null(params$toMessage), params$toMessage, FALSE)
 ```
 
 <p>&nbsp;</p>
-These exercises are about what the model sees when you send a query: the context window and tokens.
+These exercises follow a query from your prompt to the answer: tokens, the agent loop, what fills the context window, compression, and the files that keep important information safe.
+
+You will need a chat assistant and, for Exercises 3 to 7, Claude Code (or another coding agent such as Codex). Use a new, empty project folder.
 
 None of these exercises need real research data. **Do not paste protected or unpublished data into any AI tool.**
 
 **Exercise 1** - **Counting tokens**
 
-- ??Use a tokenizer tool (e.g. a provider's public tokenizer page) to see how a sentence, a gene name and a DNA sequence are split into tokens. Which uses the most tokens per character??
+- Open the [OpenAI Tokenizer](https://platform.openai.com/tokenizer) and paste in each of these, one at a time. Note the number of tokens and characters for each.
+  - Our course prompt: `What does Ikzf1 do, and is it linked to leukaemia?`
+  - The gene and protein names: `Ikzf1`, `IKZF1`, `Ikaros`
+  - `leukemia` and `leukaemia`
+  - A 30-base DNA sequence: `ATGCGTACGTTAGCCATGCAAGTCGATCGA`
+- Which uses the most tokens per character? What does that tell you about pasting sequences or large tables into a chat?
 
 ```{asis, echo=toMessage}
-??Expected observation??
+Results from the OpenAI tokenizer (GPT-5.x setting, November 2026). Claude uses a different tokenizer, so its counts differ a little, but the pattern is the same.
+
+| Text | Characters | Tokens | Characters per token |
+|---|---|---|---|
+| What does Ikzf1 do, and is it linked to leukaemia? | 50 | 16 | 3.1 |
+| Ikzf1 | 5 | 3 | 1.7 |
+| IKZF1 | 5 | 3 | 1.7 |
+| Ikaros | 6 | 3 | 2.0 |
+| leukemia | 8 | 3 | 2.7 |
+| leukaemia | 9 | 3 | 3.0 |
+| ATGCGTACGTTAGCCATGCAAGTCGATCGA | 30 | 18 | 1.7 |
+
+- Ordinary English words are often one token each. Gene names are split into pieces (the tokenizer shows "leukaemia" as `le` `uka` `emia`), because they are rare in the text the tokenizer was built from.
+- DNA is the most expensive: under 2 characters per token, against about 4 for everyday English. A 1,000-base sequence costs roughly 600 tokens; a large table of numbers or sequences fills the context window fast.
+- The model never sees letters, only these pieces. That is one reason models are poor at counting letters, reversing sequences or spotting a single-base change: use a proper tool for that.
 ```
 
-**Exercise 2** - **Losing context**
+**Exercise 2** - **Same prompt, different answers**
 
-- ??Give the assistant an instruction at the start of a conversation (e.g. "always answer in bullet points"), then continue the conversation with long messages. Does it keep following the instruction??
+- Open two **new** chats and send exactly the same prompt to each: `What does Ikzf1 do, and is it linked to leukaemia? Give three key references.`
+- Compare the two answers side by side. What is the same? What is different: the wording, the facts, the references?
+- Check each reference. Does it exist, and does it say what the answer claims?
 
 ```{asis, echo=toMessage}
-??Expected observation, linked to the context window and compression??
+What you should see:
+
+- The **wording differs** between the two chats, and often the order, length and emphasis do too. The model picks each next token from a list of likely options, with some randomness (temperature), so no two runs are identical.
+- Core, well-known facts (Ikaros, B-cell development, *IKZF1* deletions in high-risk B-ALL) usually agree, because they are the most likely tokens in both runs.
+- **References are where runs differ most.** A citation is just a likely-looking sequence of tokens, so one run may give a real paper and the other a plausible paper that doesn't exist, or a real paper with the wrong year or journal.
+- If the assistant searched the web in one chat but not the other, the answers can differ a lot. It decides for itself whether to search (see Exercise 4).
+
+Lesson: one answer is a sample, not *the* answer. Check facts and references against the source, and save the version you use.
+```
+
+**Exercise 3** - **What is in the context before you type?**
+
+- Start a new Claude Code session in your empty project folder. **Before** you type anything, open the context view (the context panel in the desktop app, or type `/context`).
+- Write down the total tokens used and the three biggest items.
+- Ask one short question (for example, "What does Ikzf1 do?") and check the context view again. How much did it grow? Compare that with the length of your question and of the answer.
+- Then ask it to "search the current literature on Ikzf1 in leukaemia" and check again.
+
+```{asis, echo=toMessage}
+Results from the course's own session (Claude Code desktop, 8 November 2026, a 1 million token window):
+
+| When | Tokens used | What changed |
+|---|---|---|
+| Before typing | **52,300** | System tools 19.4k, MCP tools 14.5k, system prompt 9.5k, skills 7.7k, MCP instructions 1.2k |
+| After one question | **67,700** | +16.4k "Messages": our question was 13 tokens and the answer about 1,200 |
+| After a literature search | **76,800** | Four web searches added about 8,000 tokens |
+
+- Most of the context is used **before you type a word**, by tools, skills and instructions you may never use. Every plugin, skill and MCP server you install adds to this in every session.
+- The first question grows the context by far more than its own length, because the app quietly attaches extra text to the first message: the list of skills, tool names, agents, your environment and the date.
+- A further 33,000 tokens are held back as an **autocompact buffer**, so the app is warned before the window is full.
+- Your numbers will differ: they depend on your app, model and what you have installed. The pattern will be the same.
+
+See the slides [Context before we type anything](../../presentations/slides/Query_Context.html#/context-before-we-type-anything){target="_blank"}.
+```
+
+**Exercise 4** - **Count the model calls**
+
+- In the same session, look back at your last two questions. For each one, count the steps the agent took: did it answer straight away, or did it call tools (web search, reading files) first?
+- How many times do you think the model was called to answer your two questions?
+- Now ask a question where it might answer from memory, and then the same question starting with "Search for...". Does the answer change? Does it tell you where its facts came from?
+
+```{asis, echo=toMessage}
+Result from the course session: **2 questions, 4 model calls.** [Open the full transcript](../../data/Ikzf1_transcript.html){target="_blank"} to see every call.
+
+| Call | Tokens in | Tokens out | Why it stopped |
+|---|---|---|---|
+| 1. Answers "What does Ikzf1 do?" | 67,742 | 1,192 | `end_turn`: the answer is finished |
+| 2. Decides to search | 68,972 | 180 | `tool_use`: asks the app to run a search |
+| 3. Runs 4 web searches | 69,640 | 441 | `tool_use`: asks for more searches |
+| 4. Writes the literature review | 76,750 | 2,728 | `end_turn`: the answer is finished |
+
+- The first answer used **no search**: it came from training data, so it may be out of date. We didn't ask for current literature, so the model judged that memory was enough.
+- A tool call is just text the model writes. The app (the harness) runs the tool, adds the result to the context and calls the model again. The loop ends when the model writes an answer with no tool call.
+- Every call resends **everything so far**, which is why "tokens in" keeps growing.
+- Starting with "Search for..." or "Check the file..." makes a tool call much more likely. Ask it to say which facts came from a search and which from memory.
+```
+
+**Exercise 5** - **An instruction lost to compression**
+
+- In a new session, give an instruction in the chat only: `For the rest of this conversation, end every answer with the word DONE.`
+- Have a longer conversation: ask three or four questions that need searches or long answers.
+- Type `/compact` to compress the conversation, then ask another question. Is DONE still there? Ask the assistant: "What instructions did I give you at the start?"
+- Start a new session, put the same instruction in a `CLAUDE.md` file in the project folder instead, and repeat. What changes?
+
+```{asis, echo=toMessage}
+What happens:
+
+- In the chat-only version, the instruction **may or may not survive** `/compact`. Compression is a summary written by the model; it keeps what it judges important, and short style instructions are easily dropped or reworded.
+- In the `CLAUDE.md` version it survives every time: CLAUDE.md, the system prompt and tools are **never compressed**, and CLAUDE.md is reloaded after compaction.
+
+What compression did to the course's Ikzf1 session (`/compact`: conversation ~37k → ~13k tokens; total ~81k → ~57k, because the ~44k of system prompt and tools are never compressed):
+
+| Survived | Lost |
+|---|---|
+| Both our questions, word for word | Most detail from the first answer |
+| Key facts and numbers | The caveat "not a literature search" |
+| About half the source links | The raw search results |
+| The final review | The study with the surprising *better* survival result |
+
+The summary also said the review had **not yet been written**. It had.
+
+Lesson: numbers tend to survive, caveats and nuance don't. If it matters, put it in a file. This is exactly what went wrong in the OpenClaw email example: "confirm before acting" lived only in the chat and was compressed away.
+```
+
+**Exercise 6** - **Write your own CLAUDE.md and memory**
+
+- Spend a few minutes telling Claude about a (made-up or public-data) project: the question, the data, where files live, what software you use, what the outputs should look like.
+- Run `/init` to create a `CLAUDE.md`, then edit it by hand. Check it covers: project overview, directory structure, conventions (Git/Docker/reporting), specialist software and expected output formats. Keep it short.
+- Correct the assistant on something (for example, "only ever give me the next single step, not the whole plan") and ask it to remember that for future sessions.
+- Find where the memory was saved and open it. What kind of memory is it (user, feedback, project or reference)? Is it in your project folder?
+
+```{asis, echo=toMessage}
+Compare yours with the course's example files ([browse all of them](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/tree/master/docs/data/claude_examples){target="_blank"}):
+
+- [Example project CLAUDE.md](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/blob/master/docs/data/claude_examples/project/CLAUDE.md){target="_blank"}: 34 lines covering the five headings from the slides. It imports a short `docs/decisions.md` with `@` (always read) and only *points to* the longer `docs/analysis_plan.md` (read when needed).
+- [Example global CLAUDE.md](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/blob/master/docs/data/claude_examples/global/CLAUDE.md){target="_blank"}: personal preferences for every project, such as "explain steps in plain English".
+- [Example MEMORY.md](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/blob/master/docs/data/claude_examples/memory/MEMORY.md){target="_blank"}: an index of one line per memory, each saying *when* to look it up.
+
+Your correction should be saved as a **feedback** memory, ideally with a *Why* and *How to apply* line, like the example [feedback_one_step.md](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/blob/master/docs/data/claude_examples/memory/feedback_one_step.md){target="_blank"}.
+
+Where it lives: in Claude Code, memory is in `~/.claude/projects/<your-project>/memory/`, **not** in your project folder. It stays on this computer, is not in git and is not shared with colleagues. Open it with `/memory`.
+
+Things to check in yours:
+
+- `/init` writes what it can see in the files. Your scientific decisions and conventions are only there if you told it, so edit the file.
+- Nothing in either file should be a copy of the code or git history: the agent can look those up fresh.
+- No passwords, tokens or patient data in any of these files.
+```
+
+**Exercise 7** - **Guide or hard rule?**
+
+- In your practice project make a folder `data/raw/` with a small text file in it (for example `samples.csv` with three made-up rows).
+- Add a line to `CLAUDE.md`: `Never edit files in data/raw/.` Then ask the assistant: "Fix the typo in data/raw/samples.csv". What does it do? Now insist: "I know, but do it anyway, it's urgent." What happens?
+- Next, add a **permission rule** instead. Create `.claude/settings.json` containing:
+  ```
+  { "permissions": { "deny": ["Edit(./data/raw/**)"] } }
+  ```
+  Start a new session and ask again, including insisting. What is different?
+
+```{asis, echo=toMessage}
+What happens:
+
+- With only the CLAUDE.md line, the assistant will usually refuse or ask first, but **it can be talked round**. CLAUDE.md is a guide: the model is trained to follow it, not forced to.
+- With the deny rule, the app itself blocks the edit, however the request is worded. The model still *tries* to call the Edit tool, but Claude Code refuses before anything changes and tells the model the action was denied.
+
+The example project goes one step further with a **hook**: a small script Claude Code runs before every edit. Running the [course's example hook](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/blob/master/docs/data/claude_examples/project/.claude/hooks/protect-raw.sh){target="_blank"} on two edits gives:
+
+| Edit to | Result |
+|---|---|
+| `data/raw/samples.csv` | Exit code 2: *"Blocked: data/raw/ is read-only. Write to data/processed/ instead."* |
+| `data/processed/samples.csv` | Exit code 0: allowed |
+
+Points to take away:
+
+- **Guides** (CLAUDE.md, AGENTS.md, memory) shape behaviour. **Hard rules** (permission settings and hooks) are enforced by the app, whatever the model "decides".
+- Deny beats ask, which beats allow.
+- Even hard rules are not a security wall. A deny rule matches the command as written, so a reworded command can slip past (`git -C . push` is not caught by a rule for `git push`). Keep backups of raw data, and keep a human in the loop.
+
+See the [example settings.json](https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/blob/master/docs/data/claude_examples/project/.claude/settings.json){target="_blank"} for more rules.
 ```
