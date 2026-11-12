@@ -24,6 +24,7 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 - [Plugins](#plugins)
 - [Agents in plugins](#agents-in-plugins)
 - [Hooks in plugins](#hooks-in-plugins)
+- [BRC MCP](#brc-mcp)
 - [Exercises](#time-for-an-exercise)
 
 # What connectors are {#what-connectors-are background-color="#23373B" .center .middle}
@@ -459,6 +460,96 @@ You don't need to build an MCP server for most work: an existing server, a comma
 Building one makes sense when your lab has a **database or internal system** that no existing server covers, and you want controlled, signed-in access to it.
 
 The BRC server is an example: tools scoped to your lab, a preview before anything that uses compute, and instructions that forbid invented numbers. See *BRC and AI Tools*, and talk to us at [brc@rockefeller.edu](mailto:brc@rockefeller.edu) before building one.
+
+# BRC MCP {#brc-mcp .center .middle background-color="#23373B"}
+
+## The BRC plugin for Claude
+
+Ask questions of your sequencing data **in plain English**. Claude finds the samples, runs BRC pipelines and writes the report.
+
+```{mermaid}
+flowchart LR
+  U(["You<br/>'Compare EpSC vs SB<br/>and flag bad samples'"]) --> C["Claude +<br/>BRC plugin"]
+  C --> S["<b>Skills</b><br/>BRC workflows<br/>and known pitfalls"]
+  C --> M["<b>Connector (MCP)</b><br/>secure, scoped<br/>to your lab"]
+  M --> D[("BRC data and compute<br/>pipeline samples · QC<br/>DESeq2 on the HPC<br/>lab expression matrices<br/>single-cell datasets<br/>IGV · BRC training")]
+```
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+The plugin bundles two things from the Skills and Connectors sessions: skills (how the BRC runs a DE analysis, which QC numbers matter, common traps such as reused sample names) and an MCP connector to the BRC server.
+The connector only exposes defined tools: Claude can't browse the server freely. Access follows your lab login.
+:::
+:::::
+
+## What you can do with it {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Bulk RNA-seq**
+
+- Find your lab's samples and sequencing runs
+- **QC** every library and flag failed ones
+- Run a **differential expression** report on the HPC (previewed first, run only with your OK)
+- Pull top genes, filter to a gene family, check the biology
+- Look up any gene across **every sample your lab has sequenced**
+- Build an **IGV genome browser** view linked to the results
+:::
+
+::: {.column width="50%"}
+**Single-cell RNA-seq**
+
+- Browse the single-cell datasets the BRC hosts (76 today)
+- QC per sample or donor, cells per cluster
+- UMAPs, dot plots and violin plots
+- Marker genes between clusters or conditions
+
+**Everything**
+
+- Answers backed by **BRC training material**, with links
+- One shareable **report** at the end
+:::
+
+::::
+
+## Example reports {.smaller}
+
+Each one was made in a single Claude session with the BRC plugin.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+[![](../imgs/brc_bulk_volcano.png){fig-alt="Volcano plot of 4,639 genes changed between EpSC and SB samples." height="320px"}](../../data/brc_reports/BRC_bulk_RNAseq_report.html){target="_blank"}
+
+[**Bulk RNA-seq**](../../data/brc_reports/BRC_bulk_RNAseq_report.html){target="_blank"}: QC of 12 libraries (2 flagged), differential expression, and expression across 243 lab samples.
+:::
+
+::: {.column width="50%"}
+[![](../imgs/brc_sc_umap.png){fig-alt="UMAP of 15,457 human skin cells coloured by cluster." height="320px"}](../../data/brc_reports/BRC_scRNAseq_skin_report.html){target="_blank"}
+
+[**Single-cell RNA-seq**](../../data/brc_reports/BRC_scRNAseq_skin_report.html){target="_blank"}: young vs aged human skin (public data): QC per donor, clusters, cell types and composition.
+:::
+
+::::
+
+::::: {.content-visible when-format="revealjs"}
+::: notes
+Bulk data are real BRC pipeline data, anonymised for teaching (lab, user and sample names removed). The single-cell data are public: GSE130973, Solé-Boldo et al. 2020.
+Points to make: QC caught two weak libraries from the same animal; keratins confirm the groups; the SB "signal" is largely immune/melanocyte cells, i.e. composition. In single-cell, T cells are 17-22% of young-donor cells vs 1-3% old, and one cluster is a single-donor artefact.
+Both reports end with "check before you use": the AI ran BRC pipelines, the science is still yours.
+:::
+:::::
+
+## Built for responsible use
+
+- **Your data stay on BRC servers.** Claude sees only the summaries and plots it asks for.
+- **Access follows your login**, scoped to your lab.
+- **Nothing expensive happens without you.** Anything that uses HPC compute shows a preview and waits for your OK.
+- **No invented numbers.** The plugin is told to copy every value from a BRC result, never from memory.
+- **The science is still yours.** Statistical and biological judgement goes to you and BRC staff, not the AI.
+
+Want to try it, or need an analysis reviewed? **brc@rockefeller.edu**
 
 ## Time for an exercise
 
