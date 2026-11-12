@@ -26,15 +26,17 @@ These exercises are about extending an AI assistant with instruction files and s
 **Exercise 1** - **Before and after CLAUDE.md**
 
 - Make a new folder on your computer and open a new project in your agent software within that folder.
-- Make another folder within that folder called 'key_data'
-- Copy the small RNAseq results table in the *docs/data* folder of this course named *small_DEtable.csv* to this new 'key_data' folder you have created.  
-- Ask your agent to modify this file in some way (e.g. 'read in the csv file in the 'key_data' folder and add a column called 'user' and fill it in with scientist@ru.edu')
-- What happens?
+
+  - Make another folder within that folder called 'key_data'
+  - Copy the small RNAseq results table in the *docs/data* folder of this course named *small_DEtable.csv* to this new 'key_data' folder you have created.  
+  - Ask your agent to modify this file in some way (e.g. 'read in the csv file in the 'key_data' folder and add a column called 'user' and fill it in with scientist@ru.edu')
+  - What happens?
 
 - Now make a CLAUDE.md file and include an instruction that should prevent the agent from modifying that file. 
-- Put that CLAUDE.md file into the same folder as your current session
-- Ask the agent again to modify this file. 
-- Is the behavior different?
+
+  - Put that CLAUDE.md file into the same folder as your current session
+  - Ask the agent again to modify this file. 
+  - Is the behavior different?
 
 - If you ask the agent explicitly to modify the original table and say it has permission to do so, what happens then?
 
