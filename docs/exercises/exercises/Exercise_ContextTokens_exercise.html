@@ -3075,15 +3075,60 @@ vertical-align: -.125em;
 <p>
  
 </p>
-<p>These exercises are about what the model sees when you send a query: the context window and tokens.</p>
+<p>These exercises follow a query from your prompt to the answer: tokens, the agent loop, what fills the context window, compression, and the files that keep important information safe.</p>
+<p>You will need a chat assistant and, for Exercises 3 to 7, Claude Code (or another coding agent such as Codex). Use a new, empty project folder.</p>
 <p>None of these exercises need real research data. <strong>Do not paste protected or unpublished data into any AI tool.</strong></p>
 <p><strong>Exercise 1</strong> - <strong>Counting tokens</strong></p>
 <ul>
-<li>??Use a tokenizer tool (e.g. a provider’s public tokenizer page) to see how a sentence, a gene name and a DNA sequence are split into tokens. Which uses the most tokens per character??</li>
-</ul>
-<p><strong>Exercise 2</strong> - <strong>Losing context</strong></p>
+<li>Open the <a href="https://platform.openai.com/tokenizer">OpenAI Tokenizer</a> and paste in each of these, one at a time. Note the number of tokens and characters for each.
 <ul>
-<li>??Give the assistant an instruction at the start of a conversation (e.g. “always answer in bullet points”), then continue the conversation with long messages. Does it keep following the instruction??</li>
+<li>Our course prompt: <code>What does Ikzf1 do, and is it linked to leukaemia?</code></li>
+<li>The gene and protein names: <code>Ikzf1</code>, <code>IKZF1</code>, <code>Ikaros</code></li>
+<li><code>leukemia</code> and <code>leukaemia</code></li>
+<li>A 30-base DNA sequence: <code>ATGCGTACGTTAGCCATGCAAGTCGATCGA</code></li>
+</ul></li>
+<li>Which uses the most tokens per character? What does that tell you about pasting sequences or large tables into a chat?</li>
+</ul>
+<p><strong>Exercise 2</strong> - <strong>Same prompt, different answers</strong></p>
+<ul>
+<li>Open two <strong>new</strong> chats and send exactly the same prompt to each: <code>What does Ikzf1 do, and is it linked to leukaemia? Give three key references.</code></li>
+<li>Compare the two answers side by side. What is the same? What is different: the wording, the facts, the references?</li>
+<li>Check each reference. Does it exist, and does it say what the answer claims?</li>
+</ul>
+<p><strong>Exercise 3</strong> - <strong>What is in the context before you type?</strong></p>
+<ul>
+<li>Start a new Claude Code session in your empty project folder. <strong>Before</strong> you type anything, open the context view (the context panel in the desktop app, or type <code>/context</code>).</li>
+<li>Write down the total tokens used and the three biggest items.</li>
+<li>Ask one short question (for example, “What does Ikzf1 do?”) and check the context view again. How much did it grow? Compare that with the length of your question and of the answer.</li>
+<li>Then ask it to “search the current literature on Ikzf1 in leukaemia” and check again.</li>
+</ul>
+<p><strong>Exercise 4</strong> - <strong>Count the model calls</strong></p>
+<ul>
+<li>In the same session, look back at your last two questions. For each one, count the steps the agent took: did it answer straight away, or did it call tools (web search, reading files) first?</li>
+<li>How many times do you think the model was called to answer your two questions?</li>
+<li>Now ask a question where it might answer from memory, and then the same question starting with “Search for…”. Does the answer change? Does it tell you where its facts came from?</li>
+</ul>
+<p><strong>Exercise 5</strong> - <strong>An instruction lost to compression</strong></p>
+<ul>
+<li>In a new session, give an instruction in the chat only: <code>For the rest of this conversation, end every answer with the word DONE.</code></li>
+<li>Have a longer conversation: ask three or four questions that need searches or long answers.</li>
+<li>Type <code>/compact</code> to compress the conversation, then ask another question. Is DONE still there? Ask the assistant: “What instructions did I give you at the start?”</li>
+<li>Start a new session, put the same instruction in a <code>CLAUDE.md</code> file in the project folder instead, and repeat. What changes?</li>
+</ul>
+<p><strong>Exercise 6</strong> - <strong>Write your own CLAUDE.md and memory</strong></p>
+<ul>
+<li>Spend a few minutes telling Claude about a (made-up or public-data) project: the question, the data, where files live, what software you use, what the outputs should look like.</li>
+<li>Run <code>/init</code> to create a <code>CLAUDE.md</code>, then edit it by hand. Check it covers: project overview, directory structure, conventions (Git/Docker/reporting), specialist software and expected output formats. Keep it short.</li>
+<li>Correct the assistant on something (for example, “only ever give me the next single step, not the whole plan”) and ask it to remember that for future sessions.</li>
+<li>Find where the memory was saved and open it. What kind of memory is it (user, feedback, project or reference)? Is it in your project folder?</li>
+</ul>
+<p><strong>Exercise 7</strong> - <strong>Guide or hard rule?</strong></p>
+<ul>
+<li><p>In your practice project make a folder <code>data/raw/</code> with a small text file in it (for example <code>samples.csv</code> with three made-up rows).</p></li>
+<li><p>Add a line to <code>CLAUDE.md</code>: <code>Never edit files in data/raw/.</code> Then ask the assistant: “Fix the typo in data/raw/samples.csv”. What does it do? Now insist: “I know, but do it anyway, it’s urgent.” What happens?</p></li>
+<li><p>Next, add a <strong>permission rule</strong> instead. Create <code>.claude/settings.json</code> containing:</p>
+<pre><code>{ &quot;permissions&quot;: { &quot;deny&quot;: [&quot;Edit(./data/raw/**)&quot;] } }</code></pre>
+<p>Start a new session and ask again, including insisting. What is different?</p></li>
 </ul>
 
 </main>
