@@ -5022,12 +5022,13 @@ z-index: 1000;
   <ul class="collapse">
   <li><a href="#installing-skills---public-marketplaces" id="toc-installing-skills---public-marketplaces" class="nav-link" data-scroll-target="#installing-skills---public-marketplaces">Installing skills - Public marketplaces</a></li>
   <li><a href="#installing-skills---single-skill-with-npx" id="toc-installing-skills---single-skill-with-npx" class="nav-link" data-scroll-target="#installing-skills---single-skill-with-npx">Installing skills - Single skill with npx</a></li>
-  <li><a href="#installing-skills-1" id="toc-installing-skills-1" class="nav-link" data-scroll-target="#installing-skills-1">Installing skills</a></li>
+  <li><a href="#installing-skills---ask-agent" id="toc-installing-skills---ask-agent" class="nav-link" data-scroll-target="#installing-skills---ask-agent">Installing skills - Ask agent</a></li>
   <li><a href="#installing-skills---security" id="toc-installing-skills---security" class="nav-link" data-scroll-target="#installing-skills---security">Installing skills - Security</a></li>
   <li><a href="#popular-pluginskill-repositories" id="toc-popular-pluginskill-repositories" class="nav-link" data-scroll-target="#popular-pluginskill-repositories">Popular plugin/skill repositories</a></li>
   <li><a href="#some-useful-skills" id="toc-some-useful-skills" class="nav-link" data-scroll-target="#some-useful-skills">Some useful SKILLs</a></li>
   <li><a href="#review---good-skill-practice" id="toc-review---good-skill-practice" class="nav-link" data-scroll-target="#review---good-skill-practice">Review - Good skill practice</a></li>
   <li><a href="#time-for-an-exercise" id="toc-time-for-an-exercise" class="nav-link" data-scroll-target="#time-for-an-exercise">Time for an exercise</a></li>
+  <li><a href="#answers-to-exercise" id="toc-answers-to-exercise" class="nav-link" data-scroll-target="#answers-to-exercise">Answers to exercise</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -5136,11 +5137,12 @@ Bioinformatics Resource Center - Rockefeller University<p></p>
 </section>
 <section id="skills" class="level2">
 <h2 class="anchored" data-anchor-id="skills">Skills</h2>
-<p>Skills can also be explicitly invoked with the forward slash (<code>/skill-name</code>), but they are different in a few key ways:</p>
+<p>Like these commands, skills can also be explicitly invoked with the forward slash (<code>/skill-name</code>)</p>
+<p>They are different in a few key and very useful ways:</p>
 <ul>
-<li>can be called explicitly by you or passively by the model after a prompt.</li>
-<li>allow for a high level of customization</li>
-<li>are portable</li>
+<li>can be called explicitly by you or <strong>passively by the model after a prompt.</strong></li>
+<li>allow for a high level of customization.</li>
+<li>are portable so they can easily be shared.</li>
 </ul>
 </section>
 <section id="skills-help-with-reproducibility" class="level2">
@@ -5166,13 +5168,12 @@ Bioinformatics Resource Center - Rockefeller University<p></p>
 <ul>
 <li>the <em>SKILL.md</em> file is the only required file in the skills directory.</li>
 </ul>
-<pre class="tree">bioinformatics-skill/
-├── SKILL.md          # Required: metadata (e.g. name, description) + instructions
-├── scripts/          # Optional: code that can be run when skill is fired
-├── references/       # Optional: documentation (e.g. method specifics, checklists)
-├── assets/           # Optional: report templates, data files, images, etc.
-└── ...               # additional files or folders 
-</pre>
+<pre class="text"><code>My_favorite_Skill/
+├── SKILL.md          # Required: metadata + instructions
+├── scripts/          # Optional: executable code
+├── references/       # Optional: documentation
+├── assets/           # Optional: templates, resources
+└── ...               # Any additional files or directories</code></pre>
 </section>
 <section id="skill-scope" class="level2">
 <h2 class="anchored" data-anchor-id="skill-scope">Skill scope</h2>
@@ -5280,17 +5281,17 @@ border-radius:999px; padding:0.15rem 0.6rem; font-size:0.68rem; font-weight:600;
 <p>The required <em>SKILL.md</em> file needs a YAML header and must have the <code>name</code> and <code>description</code> fields.</p>
 <ul>
 <li><strong>name:</strong> can only contain lower case letters, numbers, and hyphens (no hyphens at the beginning or end of the name)</li>
-<li><strong>description:</strong> max of 1024 characters outlining what this skill does, and when the model should use it.</li>
-<li>A few <a href="https://agentskills.io/specification">other optional fields</a> are allowed as well</li>
+<li><strong>description:</strong> max of 1024 characters outlining what this skill does and <strong>when the model should use it.</strong></li>
+<li>the agent uses both of these fields when deciding to activate the skill, but the description is the most important</li>
 </ul>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>SKILL.md</strong></pre>
 </div>
-<div class="sourceCode" id="cb1" data-filename="SKILL.md"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> bioinformatics-skill</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="at"> What does this skill do? When should it be used?</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2" data-filename="SKILL.md"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> bioinformatics-skill</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="at"> What does this skill do? When should it be used?</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><a href="https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/tree/master/docs/data/skills_examples/gene-summary/SKILL.md" target="_blank">See an example SKILL.md</a></p>
 </section>
@@ -5305,17 +5306,7 @@ border-radius:999px; padding:0.15rem 0.6rem; font-size:0.68rem; font-weight:600;
 <li>when to access scripts or files within skills folder</li>
 </ul>
 <p>It is recommended to keep the SKILL.md file below 500 lines (~5k tokens), and more details or code templates can be selectively read from the <em>references</em> or <em>assets</em> folders.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>SKILL.md</strong></pre>
-</div>
-<div class="sourceCode" id="cb2" data-filename="SKILL.md"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> bioinformatics-skill</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="at"> What does this skill do? When should it be used?</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">body</span><span class="kw">:</span><span class="at"> instructions for the model</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p><a href="https://github.com/RockefellerUniversity/responsible_use_of_Agentic_AI/tree/master/docs/data/skills_examples/gene-summary/SKILL.md" target="_blank">See an example SKILL.md</a></p>
 </section>
 <section id="references-and-scripts" class="level2 smaller">
 <h2 class="smaller anchored" data-anchor-id="references-and-scripts">References and scripts</h2>
@@ -5376,14 +5367,13 @@ genes, counts, % mito&quot;]
 <h2 class="anchored" data-anchor-id="a-good-description-is-key">A good description is key</h2>
 <p>This format makes the description the critical part of the skill. It will determine whether a skill is used after a prompt is entered.</p>
 <p>If the description is too vague, then it will fire too often and use tokens unnecessarily. If it’s too narrow, then it will rarely be used.</p>
-<p>Description tips:</p>
+<p><strong>Description tips:</strong></p>
 <ul>
 <li>should focus primarily on what the user is trying to do, and less on what the skill does internally.</li>
-<li>explicitly say when it should be used: ‘Use this skill when user asks to review, check, or QC scRNA analyses’, not ‘This skill performs QC for scRNAseq analyses’</li>
-<li>including multiple keywords you will often use will help (‘review’ or ‘check’ above)</li>
+<li>explicitly say when it should be used: ‘Use this skill when user asks to review, check, or QC a scRNA analyses’, not ‘This skill performs QC for scRNAseq analyses’</li>
+<li>including multiple keywords will help (‘review’ or ‘check’ above)</li>
 <li>can also include when it should not be used</li>
 </ul>
-<p><strong>A skill is still a guide:</strong> it makes good behaviour likely, not certain.</p>
 </section>
 </section>
 <section id="developing-skills" class="level1 center middle" data-background-color="#23373B">
@@ -5403,7 +5393,7 @@ mkdir -p .claude/skills/bioinformatics-skill </code></pre>
 <h2 class="anchored" data-anchor-id="built-in-skill-creators">Built-in skill creators</h2>
 <p>Both Claude Code and Codex have skills that help guide you through making a new skill (<code>/skill-creator</code> for Claude).</p>
 <ul>
-<li>As with any skill, they will usually be activated when you ask the model to make a skill (e.g. <em>I’d like to make a skill that reads in scRNAseq data and makes initial QC plots</em>)</li>
+<li>As with any skill, they will usually be activated when you ask the model to make a skill (e.g. <em>Help me make a new skill to read in a Seurat object and perform quality control and obtain rough clustering info.</em>)</li>
 <li>These tools are designed to interview you to understand exactly what you want the skill to do.</li>
 <li>The quality of the follow up questions depends on how well that type of task is represented in the model’s training (scRNAseq will result in better interview set up than a more obscure method)</li>
 <li>can also explicitly call the skill: <code>/skill-creator &lt;description of skill to make&gt;</code></li>
@@ -5416,8 +5406,10 @@ mkdir -p .claude/skills/bioinformatics-skill </code></pre>
 </section>
 <section id="building-skills-from-your-actual-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="building-skills-from-your-actual-analysis">Building skills from your actual analysis</h2>
-<p>In reality, your most useful skills will be made by the LLM, but are built from your actual analyses. The skill creator is designed to turn key discussion points within your session into facets of the skill.</p>
+<p>In reality, your most useful skills will be made by the LLM, but are <strong>built from your actual analyses</strong>. The skill creator is designed to turn key discussion points within your session into facets of the skill.</p>
+<p><br></p>
 <p>This allows the model to identify packages you prefer, plot styles you like, important thresholds or quirks related to your studies, key decision points or edge cases, and to include this information in the skill.</p>
+<p><br></p>
 <p>Specifics related to your work increase the value of a skill beyond just simply asking the model to do that task with no skill present.</p>
 </section>
 <section id="smaller-skills-vs-entire-workflow-as-skill" class="level2">
@@ -5444,6 +5436,7 @@ scrna-de-skill/
 </pre>
 </div>
 </div>
+<p><br></p>
 <p><strong>A good rule of thumb:</strong> at any decision point where you would usually look at the output, this is likely where the skill should end.</p>
 </section>
 </section>
@@ -5575,19 +5568,16 @@ margin-bottom: 0.4rem;
     <div class="hier-plugins">
       <div class="hier-plug">
         <div class="hier-level-label">Plugin</div>
-        <div class="hier-plug-name">mattpocock-skills</div>
+        <div class="hier-plug-name">skill-creator</div>
         <div class="hier-skills">
-          <span class="hier-skill">tdd</span>
-          <span class="hier-skill">research</span>
-          <span class="hier-skill">code-review</span>
-          <span class="hier-skill">grilling</span>
+          <span class="hier-skill">skill-creator</span>
         </div>
       </div>
       <div class="hier-plug">
         <div class="hier-level-label">Plugin</div>
-        <div class="hier-plug-name">skill-creator</div>
+        <div class="hier-plug-name">frontend-design</div>
         <div class="hier-skills">
-          <span class="hier-skill">skill-creator</span>
+          <span class="hier-skill">frontend-design</span>
         </div>
       </div>
     </div>
@@ -5647,19 +5637,21 @@ margin-bottom: 0.4rem;
 <ul>
 <li><strong>Install from a marketplace:</strong> Marketplaces contain plugins, each of which has their own set of skills.</li>
 </ul>
-<p>You can also do this explicitly on the command line.</p>
+<p>You can also do this explicitly on the command line</p>
 <p><strong>Claude Code:</strong></p>
 <div class="cell">
 <pre class="shell cell-code"><code># add marketplace from any github repository
-/plugin marketplace add &lt;owner&gt;/&lt;repo&gt; # e.g. anthropics/claude-plugins-official 
+claude plugin marketplace add &lt;owner&gt;/&lt;repo&gt; # e.g. anthropics/claude-plugins-official 
 
 # install plugin from that marketplace
-/plugin install &lt;plugin-name&gt;@&lt;marketplace-alias&gt; # e.g. skill-creator@claude-plugins-official </code></pre>
+claude plugin install &lt;plugin-name&gt;@&lt;marketplace-alias&gt; # e.g. skill-creator@claude-plugins-official 
+  
+# if in CLI (started with `claude` in terminal), use /plugin</code></pre>
 </div>
 <p><strong>Codex:</strong></p>
 <div class="cell">
-<pre class="shell cell-code"><code>/plugin marketplace add &lt;owner&gt;/&lt;repo&gt; # add marketplace
-/plugin add &lt;plugin-name&gt;@&lt;marketplace-alias&gt; # install plugin from that marketplace</code></pre>
+<pre class="shell cell-code"><code>codex plugin marketplace add &lt;owner&gt;/&lt;repo&gt; # add marketplace
+codex plugin add &lt;plugin-name&gt;@&lt;marketplace-alias&gt; # install plugin from that marketplace</code></pre>
 </div>
 </section>
 <section id="installing-skills---single-skill-with-npx" class="level2">
@@ -5669,12 +5661,13 @@ margin-bottom: 0.4rem;
 <li><strong>Add single skill with npx:</strong> This essentially just copies in the skills directory to your computer where the model will find it.</li>
 </ul>
 <div class="cell">
-<pre class="shell cell-code"><code>npx skills find
+<pre class="shell cell-code"><code># You may need to install Node.js (nodejs.org) to get npx
+npx skills find
 npx skills add &lt;owner&gt;/&lt;repo&gt;</code></pre>
 </div>
 </section>
-<section id="installing-skills-1" class="level2">
-<h2 class="anchored" data-anchor-id="installing-skills-1">Installing skills</h2>
+<section id="installing-skills---ask-agent" class="level2">
+<h2 class="anchored" data-anchor-id="installing-skills---ask-agent">Installing skills - Ask agent</h2>
 <ul>
 <li><span style="color: grey;"><strong>Install from a marketplace:</strong> Marketplaces contain plugins, each of which has their own set of skills.</span></li>
 <li><span style="color: grey;"><strong>Add single skill with npx:</strong> This essentially just copies in the skills directory to your computer where the model will find it.</span></li>
@@ -5683,7 +5676,8 @@ npx skills add &lt;owner&gt;/&lt;repo&gt;</code></pre>
 </section>
 <section id="installing-skills---security" class="level2">
 <h2 class="anchored" data-anchor-id="installing-skills---security">Installing skills - Security</h2>
-<p>It is imperative that you trust the source where you install or add skills from. Remember that the entire skill and its associated files are potentially read and run on your computer.</p>
+<p>It is imperative that you <strong>trust the source where you install or add skills from</strong>. Remember that the entire skill and its associated files are potentially read and run on your computer.</p>
+<p><br></p>
 <p>Many of your skills will likely be developed by you, but when they’re not, it’s always important to read over all the files that come with a skill that you install.</p>
 </section>
 <section id="popular-pluginskill-repositories" class="level2">
@@ -5744,19 +5738,23 @@ npx skills add &lt;owner&gt;/&lt;repo&gt;</code></pre>
 </ol>
 </div><div class="column" style="width:50%;">
 <p><strong>Testing and trusting it</strong></p>
-<ol start="6" type="1">
+<ol start="7" type="1">
 <li><strong>Test on real requests:</strong> in a fresh session. Does it load when it should, and not when it shouldn’t? Is the result better than without it?</li>
 <li><strong>Build in checks:</strong> “open every reference”, “write <em>Not found</em>, never guess”, “list what you didn’t check”.</li>
-<li><strong>Avoid what goes stale:</strong> dates, versions, “the latest”.</li>
 <li><strong>Read before you install:</strong> Skills can run scripts on your computer. Use trusted sources.</li>
 <li><strong>Keep it in git:</strong> and fix it when it gets something wrong.</li>
 </ol>
 </div>
 </div>
+<p><strong>A skill is still a guide:</strong> it makes good behaviour likely, not certain.</p>
 </section>
 <section id="time-for-an-exercise" class="level2">
 <h2 class="anchored" data-anchor-id="time-for-an-exercise">Time for an exercise</h2>
-<p>Exercises are available <a href="../exercises/exercises/Exercise_Skills_exercise.html">here</a>.</p>
+<p>Exercises are available <a href="../../exercises/exercises/Exercise_Skills_exercise.html">here</a>.</p>
+</section>
+<section id="answers-to-exercise" class="level2">
+<h2 class="anchored" data-anchor-id="answers-to-exercise">Answers to exercise</h2>
+<p>Answers can be found <a href="../../exercises/answers/Exercise_Workflow_answers.html">here</a></p>
 </section>
 </section>
 

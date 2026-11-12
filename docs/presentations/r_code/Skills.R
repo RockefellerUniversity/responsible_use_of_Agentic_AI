@@ -28,13 +28,16 @@
 ## mkdir -p .claude/skills/bioinformatics-skill
 
 ## # add marketplace from any github repository
-## /plugin marketplace add <owner>/<repo> # e.g. anthropics/claude-plugins-official
+## claude plugin marketplace add <owner>/<repo> # e.g. anthropics/claude-plugins-official
 ## 
 ## # install plugin from that marketplace
-## /plugin install <plugin-name>@<marketplace-alias> # e.g. skill-creator@claude-plugins-official
+## claude plugin install <plugin-name>@<marketplace-alias> # e.g. skill-creator@claude-plugins-official
+## 
+## # if in CLI (started with `claude` in terminal), use /plugin
 
-## /plugin marketplace add <owner>/<repo> # add marketplace
-## /plugin add <plugin-name>@<marketplace-alias> # install plugin from that marketplace
+## codex plugin marketplace add <owner>/<repo> # add marketplace
+## codex plugin add <plugin-name>@<marketplace-alias> # install plugin from that marketplace
 
+## # You may need to install Node.js (nodejs.org) to get npx
 ## npx skills find
 ## npx skills add <owner>/<repo>
