@@ -333,16 +333,31 @@ Ask yourself what information the AI has access to and no access to:
 :::
 
 
-## Key takeaways {.compact}
+## Want to try adversarial review? {.compact}
 
-- AI output sounds confident and fluent whether or not it is right, so it needs human intelligence as a failsafe.
-- Asking the same AI in the same chat is not a review, it remembers its previous assumptions and notes so it's "cheating"
-- Use a separate reviewer and ask specific questions
-- Machines can check "does it run" and "does it match"; you have to check the method and the biology and if it's reasonable
+Check out:
+
+- [https://github.com/k-dense-ai/scientific-agent-skills](https://github.com/k-dense-ai/scientific-agent-skills), or
+- `/code-review` in Claude Code
+- `/verify`
+
+For more complete lists of skills, check out Tom and Doug's slides, or try making your own if you'd like!
 
 ## Get your analysis checked at the BRC {.compact .nostretch}
 
 biocritic is the BRC's (currently in progress) AI reviewer for R and Python analyses, run entirely at Rockefeller on local models.
+
+```{mermaid}
+flowchart LR
+  subgraph HPC ["All on the Rockefeller HPC"]
+    direction LR
+    A["Your code"] --> B["Automatic checks<br/>(no AI)"]
+    B --> C["Three AI<br/>reviewers"]
+    C --> D["Check against<br/>package docs"]
+    D --> E["Ranked report"]
+  end
+  style HPC fill:none,stroke:#23373B,stroke-dasharray:5 5
+```
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -355,22 +370,44 @@ Can catch
 :::
 ::: {.column width="50%"}
 [84%]{style="font-size: 200%; color: #EB811B;"} of planted errors caught in test code
-
-```{r caught, echo=FALSE, purl=FALSE, fig.width=4.4, fig.height=1.4, fig.alt="Waffle chart of 38 squares: 32 planted errors caught, 6 missed."}
-n_caught <- 32; n_missed <- 6; n <- n_caught + n_missed
-wf <- data.frame(x = (seq_len(n) - 1) %% 10 + 1, y = -((seq_len(n) - 1) %/% 10),
-                 cat = factor(rep(c("Caught", "Missed"), times = c(n_caught, n_missed)),
-                              levels = c("Caught", "Missed")))
-ggplot(wf, aes(x, y, fill = cat)) +
-  geom_tile(width = 0.88, height = 0.88) +
-  scale_fill_manual(values = c(ru_orange, "grey80"), name = NULL) +
-  coord_equal() +
-  theme_void(base_size = 13) +
-  theme(legend.position = "right")
-```
 :::
 :::
 
 Want your code checked? [brc@rockefeller.edu](mailto:brc@rockefeller.edu)
 
 
+
+```{=html}
+<script>
+// Mermaid draws each diagram on page load, while its slide is still hidden, and
+// sizes the node boxes from that measurement. On a slow load the boxes come out
+// too small for their text. Redraw every diagram once the first pass is done.
+(function () {
+  var srcs = Array.prototype.map.call(
+    document.querySelectorAll("pre.mermaid-js"),
+    function (p) { return p.textContent.replace(/&nbsp;/g, " "); }
+  );
+  if (!srcs.length) return;
+  window.addEventListener("load", function () {
+    var tries = 0;
+    (function wait() {
+      var svgs = document.querySelectorAll("svg.mermaid-js");
+      if (svgs.length < srcs.length && tries++ < 50) return setTimeout(wait, 200);
+      document.fonts.ready.then(async function () {
+        for (var i = 0; i < srcs.length && i < svgs.length; i++) {
+          try {
+            var out = await mermaid.mermaidAPI.render("mermaid-re-" + i, srcs[i]);
+            var tmp = document.createElement("div");
+            tmp.innerHTML = out.svg;
+            var fresh = tmp.querySelector("svg");
+            fresh.classList.add("mermaid-js");
+            svgs[i].replaceWith(fresh);
+            _quartoMermaid.postProcess(fresh);
+          } catch (e) { /* keep the original diagram */ }
+        }
+      });
+    })();
+  });
+})();
+</script>
+```
